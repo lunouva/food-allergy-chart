@@ -1,0 +1,327 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* App styles (desktop-first) */
+
+.page {
+  min-height: 100vh;
+  background: #f6f6f6;
+  color: #111;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+.topbar h1 {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.printed {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #555;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+button {
+  appearance: none;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #fff;
+  color: #111;
+  border-color: #d7d7d7;
+}
+
+button.secondary:hover {
+  background: #f4f4f4;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+
+.left {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 12px;
+  height: calc(100vh - 110px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.searchRow input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+}
+
+.meta {
+  font-size: 12px;
+  color: #666;
+  min-width: 70px;
+  text-align: right;
+}
+
+.list {
+  flex: 1;
+  overflow: auto;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 2px;
+}
+
+.flavorName {
+  flex: 1;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  color: #444;
+}
+
+.hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+.right {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+
+.table th,
+.table td {
+  border: 1px solid #dcdcdc;
+  padding: 6px 8px;
+  vertical-align: top;
+}
+
+.table th {
+  background: #f3f3f3;
+  text-align: left;
+  position: sticky;
+  top: 0;
+}
+
+.colFlavor {
+  width: 260px;
+}
+
+.flavorCell {
+  font-weight: 600;
+}
+
+.empty {
+  padding: 16px;
+  color: #666;
+  text-align: center;
+}
+
+.cell.v-yes {
+  background: #e7f7ec;
+}
+
+.cell.v-no {
+  background: #fff;
+}
+
+.cell.v-unknown {
+  background: #fff6db;
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal {
+  width: 760px;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  overflow: hidden;
+}
+
+.modalHeader,
+.modalFooter {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modalFooter {
+  border-bottom: none;
+  border-top: 1px solid #eee;
+  justify-content: flex-end;
+}
+
+.modalTitle {
+  font-weight: 700;
+}
+
+.modalBody {
+  padding: 14px;
+}
+
+.field .label {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+}
+
+.grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+/* Print */
+@page {
+  size: letter portrait;
+  margin: 0.5in;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .topbar {
+    border-bottom: 0;
+    padding: 0 0 12px 0;
+  }
+
+  .split {
+    display: block;
+    padding: 0;
+  }
+
+  .right {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .table th {
+    position: static;
+  }
+}
