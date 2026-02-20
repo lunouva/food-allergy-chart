@@ -585,6 +585,23 @@ export default function HomePage() {
         </aside>
 
         <section className="right" ref={printAreaRef}>
+          <div className="printHeader">
+            <div className="brandBar" />
+            <div className="printHeaderInner">
+              <div>
+                <div className="printTitle">Food Allergies & Sensitivities</div>
+                <div className="printSub">Cold Stone Creamery (reference sheet) • Printed: {printedAt}</div>
+              </div>
+
+              {qrDataUrl ? (
+                <div className="printQrBig">
+                  <div className="printQrBigLabel">Scan for live version</div>
+                  <img className="qrBig" src={qrDataUrl} alt="QR code" />
+                </div>
+              ) : null}
+            </div>
+          </div>
+
           <div className="tableWrap">
             {outputRows.length === 0 ? (
               <table className="table">
