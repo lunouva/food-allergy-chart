@@ -1,15 +1,17 @@
 import type { Metadata } from 'next';
-import { Inter, Montserrat } from 'next/font/google';
+import { Roboto, Roboto_Condensed } from 'next/font/google';
 import './globals.css';
 
-const bodyFont = Inter({
+const bodyFont = Roboto({
   variable: '--font-body',
   subsets: ['latin'],
+  weight: ['300', '400', '500', '700', '900'],
 });
 
-const displayFont = Montserrat({
+const displayFont = Roboto_Condensed({
   variable: '--font-display',
   subsets: ['latin'],
+  weight: ['400', '700', '900'],
 });
 
 export const metadata: Metadata = {

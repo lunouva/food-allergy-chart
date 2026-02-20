@@ -187,6 +187,7 @@ function groupByCategory(rows: FlavorRecord[]): Record<Category, FlavorRecord[]>
 export default function HomePage() {
   const [search, setSearch] = useState('');
   const [masterRows, setMasterRows] = useState<Array<Omit<FlavorRecord, 'source'>>>([]);
+  const [masterStatus, setMasterStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [manualRows, setManualRows] = useState<FlavorRecord[]>(() => {
     if (typeof window === 'undefined') return [];
     const manual =
@@ -242,25 +243,38 @@ export default function HomePage() {
   // Load master data
   useEffect(() => {
     let cancelled = false;
+    setMasterStatus('loading');
+
     (async () => {
-      const res = await fetch('/api/flavors');
-      const json = (await res.json()) as {
-        rows: Array<{ flavor: string; allergens: Record<string, string> }>;
-      };
+      try {
+        const res = await fetch('/api/flavors');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = (await res.json()) as {
+          rows: Array<{ flavor: string; allergens: Record<string, string> }>;
+        };
 
-      const rows = json.rows
-        .map((r) => {
-          const allergens = Object.fromEntries(
-            ALLERGENS.map((a) => [a, normalizeValue(r.allergens?.[a] ?? 'Unknown')]),
-          ) as Record<Allergen, AllergenValue>;
+        const rows = json.rows
+          .map((r) => {
+            const allergens = Object.fromEntries(
+              ALLERGENS.map((a) => [a, normalizeValue(r.allergens?.[a] ?? 'Unknown')]),
+            ) as Record<Allergen, AllergenValue>;
 
-          const flavor = r.flavor;
-          const category = inferCategory(flavor);
-          return { flavor, category, allergens };
-        })
-        .sort((a, b) => a.flavor.localeCompare(b.flavor));
+            const flavor = r.flavor;
+            const category = inferCategory(flavor);
+            return { flavor, category, allergens };
+          })
+          .sort((a, b) => a.flavor.localeCompare(b.flavor));
 
-      if (!cancelled) setMasterRows(rows);
+        if (!cancelled) {
+          setMasterRows(rows);
+          setMasterStatus('ready');
+        }
+      } catch {
+        if (!cancelled) {
+          setMasterRows([]);
+          setMasterStatus('error');
+        }
+      }
     })();
 
     return () => {
@@ -594,6 +608,12 @@ export default function HomePage() {
           </div>
 
           {shareLoadError ? <div className="banner">{shareLoadError}</div> : null}
+          {masterStatus === 'loading' ? <div className="banner">Loading flavors…</div> : null}
+          {masterStatus === 'error' ? (
+            <div className="banner">
+              Could not load the master flavor list. You can still add flavors manually.
+            </div>
+          ) : null}
 
           <div className="filters">
             <div className="filterRow">
@@ -672,17 +692,32 @@ export default function HomePage() {
           </div>
 
           <div className="list" role="list">
-            {filteredRows.map((r) => (
-              <label key={`${r.source}:${r.flavor}`} className="row" role="listitem">
-                <input
-                  type="checkbox"
-                  checked={selected.has(r.flavor)}
-                  onChange={() => toggleFlavor(r.flavor)}
-                />
-                <span className="flavorName">{r.flavor}</span>
-                {r.source === 'manual' && <span className="badge">Manual</span>}
-              </label>
-            ))}
+            {filteredRows.length === 0 ? (
+              <div className="empty">
+                {search.trim() ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+                    <div>No flavors match “{search.trim()}”.</div>
+                    <button type="button" className="secondary" onClick={() => setSearch('')}>
+                      Clear search
+                    </button>
+                  </div>
+                ) : (
+                  <div>No flavors to show.</div>
+                )}
+              </div>
+            ) : (
+              filteredRows.map((r) => (
+                <label key={`${r.source}:${r.flavor}`} className="row" role="listitem">
+                  <input
+                    type="checkbox"
+                    checked={selected.has(r.flavor)}
+                    onChange={() => toggleFlavor(r.flavor)}
+                  />
+                  <span className="flavorName">{r.flavor}</span>
+                  {r.source === 'manual' && <span className="badge">Manual</span>}
+                </label>
+              ))
+            )}
           </div>
 
           <div className="hint">
