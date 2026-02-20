@@ -446,6 +446,12 @@ button.secondary:hover {
     font-size: 28px;
   }
 
+  .qrOnlyQr {
+    border: 2px solid #111;
+    border-radius: 20px;
+    padding: 18px;
+  }
+
   .qrBig {
     width: 220px;
     height: 220px;
@@ -457,7 +463,24 @@ button.secondary:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.qrOnlyText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.qrOnlyQr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border: 1px solid var(--borderSoft);
+  border-radius: 14px;
+  background: #fff;
 }
 
 .qrOnlyTitle {
@@ -803,13 +826,20 @@ button.secondary:hover {
 }
 
 .field input,
-.field select {
+.field select,
+.field textarea {
   width: 100%;
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid var(--chipBorder);
   background: var(--panel);
   color: var(--foreground);
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 42px;
+  line-height: 1.2;
 }
 
 .grid {

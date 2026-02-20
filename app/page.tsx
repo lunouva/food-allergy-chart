@@ -716,10 +716,11 @@ export default function HomePage() {
                 </label>
                 <label className="field">
                   <div className="label">Supporting text</div>
-                  <input
+                  <textarea
                     value={ui.qrPrintSupport}
                     onChange={(e) => setUi((p) => ({ ...p, qrPrintSupport: e.target.value }))}
                     placeholder="Show this chart on your phone"
+                    rows={2}
                   />
                 </label>
               </div>
@@ -823,11 +824,19 @@ export default function HomePage() {
           <div className={printMode === 'qr' ? 'qrOnlyWrap' : 'qrOnlyWrap hide'}>
             <div className="brandBar" />
             <div className="qrOnlyCard">
-              <div className="qrOnlyTitle">{ui.qrPrintHeadline || 'Food allergies'}</div>
-              <div className="qrOnlySubTop">{ui.qrPrintSupport || 'Show this chart on your phone'}</div>
-              {qrDataUrl ? (
-                <Image className="qrBig" src={qrDataUrl} alt="QR code" width={110} height={110} unoptimized />
-              ) : null}
+              <div className="qrOnlyText">
+                <div className="qrOnlyTitle">{ui.qrPrintHeadline || 'Food allergies'}</div>
+                <div className="qrOnlySubTop" style={{ whiteSpace: 'pre-wrap' }}>
+                  {ui.qrPrintSupport || 'Show this chart on your phone'}
+                </div>
+              </div>
+
+              <div className="qrOnlyQr" aria-label="QR code">
+                {qrDataUrl ? (
+                  <Image className="qrBig" src={qrDataUrl} alt="QR code" width={110} height={110} unoptimized />
+                ) : null}
+              </div>
+
               <div className="qrOnlySub">{qrHint || 'Scan to open this exact selection.'}</div>
             </div>
           </div>
