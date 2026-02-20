@@ -16,9 +16,11 @@
   --yesBg: #e7f7ec;
   --unknownBg: #fff6db;
 
-  /* Cold Stone-ish accents */
+  /* Cold Stone-ish accents (print-friendly) */
   --brandRed: #b5121b;
+  --brandRed2: #e02a36;
   --brandCream: #f7f0df;
+  --brandInk: #231f20;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -51,7 +53,8 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -92,8 +95,10 @@ a {
 }
 
 .topbar h1 {
+  font-family: var(--font-display), var(--font-body), ui-sans-serif, system-ui;
   font-size: 20px;
   line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 .printed {
@@ -112,19 +117,25 @@ a {
 
 button {
   appearance: none;
-  border: 1px solid var(--chipOnBg);
-  background: var(--chipOnBg);
-  color: var(--chipOnFg);
+  border: 1px solid var(--brandRed);
+  background: var(--brandRed);
+  color: #fff;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(0.95);
 }
 
 button.secondary {
   background: var(--panel);
   color: var(--foreground);
   border-color: var(--chipBorder);
+  font-weight: 600;
 }
 
 button.secondary:hover {
@@ -136,6 +147,21 @@ button.secondary:hover {
   grid-template-columns: 360px 1fr;
   gap: 16px;
   padding: 16px;
+}
+
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+
+  .left {
+    height: auto;
+    max-height: 55vh;
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
 }
 
 .left {
@@ -350,7 +376,7 @@ button.secondary:hover {
 
 .brandBar {
   height: 10px;
-  background: linear-gradient(90deg, var(--brandRed), #e02a36, var(--brandCream));
+  background: linear-gradient(90deg, var(--brandRed), var(--brandRed2), var(--brandCream));
 }
 
 .printHeaderInner {
@@ -362,6 +388,7 @@ button.secondary:hover {
 }
 
 .printTitle {
+  font-family: var(--font-display), var(--font-body), ui-sans-serif, system-ui;
   font-size: 18px;
   font-weight: 900;
   letter-spacing: -0.01em;

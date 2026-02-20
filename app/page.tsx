@@ -234,6 +234,7 @@ export default function HomePage() {
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [qrHint, setQrHint] = useState<string>('');
   const [shareLoadError, setShareLoadError] = useState<string>('');
+  const [copyHint, setCopyHint] = useState<string>('');
   const [printMode, setPrintMode] = useState<'full' | 'qr'>('full');
 
   const printAreaRef = useRef<HTMLDivElement | null>(null);
@@ -391,6 +392,18 @@ export default function HomePage() {
 
   const masterFlavorCount = masterRows.length;
 
+  async function onCopyShareLink() {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopyHint('Copied.');
+    } catch {
+      setCopyHint('Could not copy (browser blocked clipboard).');
+    } finally {
+      window.setTimeout(() => setCopyHint(''), 1500);
+    }
+  }
+
   function toggleFlavor(name: string) {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -402,6 +415,18 @@ export default function HomePage() {
 
   function clearSelection() {
     setSelected(new Set());
+  }
+
+  function selectAllShown() {
+    setSelected((prev) => new Set([...prev, ...filteredRows.map((r) => r.flavor)]));
+  }
+
+  function clearShown() {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      for (const r of filteredRows) next.delete(r.flavor);
+      return next;
+    });
   }
 
   function selectAllMaster() {
@@ -549,10 +574,23 @@ export default function HomePage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search flavors..."
+              placeholder="Search flavors…"
               aria-label="Search flavors"
             />
-            <div className="meta">{filteredRows.length} shown</div>
+            <div className="meta">
+              {filteredRows.length} shown
+              <br />
+              {selectedRows.length} selected
+            </div>
+          </div>
+
+          <div className="actionsRow" style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+            <button className="secondary" type="button" onClick={selectAllShown} title="Select all currently shown">
+              Select shown
+            </button>
+            <button className="secondary" type="button" onClick={clearShown} title="Clear selection for currently shown">
+              Clear shown
+            </button>
           </div>
 
           {shareLoadError ? <div className="banner">{shareLoadError}</div> : null}
@@ -619,6 +657,12 @@ export default function HomePage() {
                 {qrDataUrl ? <img className="qr" src={qrDataUrl} alt="QR code" /> : null}
                 <div className="qrMeta">
                   <div className="qrHint">{qrHint || 'Scan to view this exact selection on a phone.'}</div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <button type="button" className="secondary" onClick={onCopyShareLink}>
+                      Copy link
+                    </button>
+                    {copyHint ? <span style={{ fontSize: 12, color: 'var(--muted)' }}>{copyHint}</span> : null}
+                  </div>
                   <a href={shareUrl} target="_blank" rel="noreferrer" className="qrLink">
                     {shareUrl}
                   </a>
@@ -680,7 +724,17 @@ export default function HomePage() {
                 <tbody>
                   <tr>
                     <td colSpan={1 + ALLERGENS.length} className="empty">
-                      Select flavors on the left (or add one manually) to preview.
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
+                        <div>Select flavors on the left (or add one manually) to preview.</div>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                          <button type="button" className="secondary" onClick={selectAllMaster}>
+                            Select all (master)
+                          </button>
+                          <button type="button" className="secondary" onClick={() => setIsModalOpen(true)}>
+                            Add a flavor
+                          </button>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
