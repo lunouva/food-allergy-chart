@@ -580,6 +580,57 @@ export default function HomePage() {
       doc.text(SOURCE_PDF_URL, 40, 754);
     }
 
+    // Add a final “QR + Disclosures” page (useful when sharing the PDF).
+    doc.addPage();
+
+    const pageW = doc.internal.pageSize.getWidth();
+
+    doc.setFontSize(16);
+    doc.text('QR + Disclosures', 40, 44);
+
+    doc.setFontSize(10);
+    doc.text(`Printed: ${printed}`, 40, 62);
+
+    // QR card (headline/support first, then QR)
+    const headline = (ui.qrPrintHeadline || 'Food allergies').trim() || 'Food allergies';
+    const support = (ui.qrPrintSupport || 'Show this chart on your phone').trim() || 'Show this chart on your phone';
+    const hint = (qrHint || 'Scan to open this exact selection.').trim();
+
+    doc.setFontSize(13);
+    doc.text(headline, 40, 92);
+
+    doc.setFontSize(11);
+    doc.text(doc.splitTextToSize(support, pageW - 80), 40, 110);
+
+    if (qrDataUrl) {
+      // Center the QR below the text.
+      const qrSize = 180;
+      const x = (pageW - qrSize) / 2;
+      doc.addImage(qrDataUrl, 'PNG', x, 150, qrSize, qrSize);
+
+      doc.setFontSize(9);
+      doc.text(doc.splitTextToSize(hint, pageW - 80), 40, 350);
+    }
+
+    // Disclosures
+    doc.setFontSize(12);
+    doc.text('Disclosures (cross-contact / shared equipment)', 40, 400);
+
+    doc.setFontSize(10);
+    const disclosureLines = doc.splitTextToSize(
+      [
+        '• Many ingredients are handled in the same prep area. Even if an item does not list an allergen as an ingredient, cross-contact is possible.',
+        '• Ask staff about store-specific practices (e.g., whether peanut butter or nut ingredients are used at the same mixing surface, scoop rinse station, blenders, or topping bins).',
+        '• If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a clean mixing surface.',
+      ].join('\n'),
+      pageW - 80,
+    );
+    doc.text(disclosureLines, 40, 420);
+
+    doc.setFontSize(9);
+    doc.text(`Source: ${SOURCE_TITLE}`, 40, 740);
+    doc.text(SOURCE_PDF_URL, 40, 754);
+
     doc.save(`food-allergy-chart-${new Date().toISOString().slice(0, 10)}.pdf`);
   }
 
