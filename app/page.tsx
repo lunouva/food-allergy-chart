@@ -91,15 +91,22 @@ function makeShareUrl(payload: object) {
   return `${base}?s=${encoded}`;
 }
 
-function readSharePayload(): any | null {
-  if (typeof window === 'undefined') return null;
+function readSharePayload(): { payload: any | null; error?: string } {
+  if (typeof window === 'undefined') return { payload: null };
   const params = new URLSearchParams(window.location.search);
   const s = params.get('s');
-  if (!s) return null;
+  if (!s) return { payload: null };
+
+  // Base64url should only include A-Z a-z 0-9 - _
+  if (!/^[A-Za-z0-9_-]+$/.test(s)) return { payload: null, error: 'Invalid share link (bad characters).' };
+
   try {
-    return safeParseJson(fromBase64Url(s));
+    const decoded = fromBase64Url(s);
+    const payload = safeParseJson(decoded);
+    if (!payload) return { payload: null, error: 'Invalid share link (could not parse).' };
+    return { payload };
   } catch {
-    return null;
+    return { payload: null, error: 'Invalid share link (could not decode).' };
   }
 }
 
@@ -225,6 +232,8 @@ export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [qrDataUrl, setQrDataUrl] = useState('');
+  const [qrHint, setQrHint] = useState<string>('');
+  const [shareLoadError, setShareLoadError] = useState<string>('');
   const [printMode, setPrintMode] = useState<'full' | 'qr'>('full');
 
   const printAreaRef = useRef<HTMLDivElement | null>(null);
@@ -260,7 +269,8 @@ export default function HomePage() {
 
   // Load shared selection from URL (?s=...)
   useEffect(() => {
-    const payload = readSharePayload();
+    const { payload, error } = readSharePayload();
+    if (error) setShareLoadError(error);
     if (!payload) return;
 
     try {
@@ -278,7 +288,7 @@ export default function HomePage() {
         }));
       }
     } catch {
-      // ignore
+      setShareLoadError('Invalid share link (could not apply selection).');
     }
   }, []);
 
@@ -303,21 +313,38 @@ export default function HomePage() {
     const url = makeShareUrl({ v: 1, selected: Array.from(selected), ui });
     setShareUrl(url);
 
+    // Keep QR reliably scannable by enforcing a max URL length.
+    const MAX_SHARE_URL_LENGTH = 1500;
+
     let cancelled = false;
     (async () => {
       if (!url) {
         setQrDataUrl('');
+        setQrHint('');
         return;
       }
+
+      if (url.length > MAX_SHARE_URL_LENGTH) {
+        setQrDataUrl('');
+        setQrHint('Too many items selected for a scannable QR. Reduce selection.');
+        return;
+      }
+
       try {
         const dataUrl = await QRCode.toDataURL(url, {
           margin: 1,
           width: 180,
           errorCorrectionLevel: 'M',
         });
-        if (!cancelled) setQrDataUrl(dataUrl);
+        if (!cancelled) {
+          setQrDataUrl(dataUrl);
+          setQrHint('');
+        }
       } catch {
-        if (!cancelled) setQrDataUrl('');
+        if (!cancelled) {
+          setQrDataUrl('');
+          setQrHint('QR could not be generated for this selection.');
+        }
       }
     })();
 
@@ -528,6 +555,8 @@ export default function HomePage() {
             <div className="meta">{filteredRows.length} shown</div>
           </div>
 
+          {shareLoadError ? <div className="banner">{shareLoadError}</div> : null}
+
           <div className="filters">
             <div className="filterRow">
               <div className="filterLabel">Print / export categories</div>
@@ -589,7 +618,7 @@ export default function HomePage() {
               <div className="qrRow">
                 {qrDataUrl ? <img className="qr" src={qrDataUrl} alt="QR code" /> : null}
                 <div className="qrMeta">
-                  <div className="qrHint">Scan to view this exact selection on a phone.</div>
+                  <div className="qrHint">{qrHint || 'Scan to view this exact selection on a phone.'}</div>
                   <a href={shareUrl} target="_blank" rel="noreferrer" className="qrLink">
                     {shareUrl}
                   </a>

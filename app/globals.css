@@ -199,8 +199,19 @@ button.secondary:hover {
   color: var(--muted);
 }
 
+.banner {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--borderSoft);
+  background: var(--panelAlt);
+  color: var(--foreground);
+  font-size: 12px;
+}
+
 .filters {
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--borderSoft);
   padding-top: 10px;
   margin-bottom: 10px;
 }
