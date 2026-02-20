@@ -478,13 +478,21 @@ button.secondary:hover {
 .printLegend {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   justify-content: flex-end;
   font-size: 11px;
   color: var(--foreground);
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
+}
+
+.legendTitle {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 2px;
 }
 
 .legendItem {
@@ -678,6 +686,12 @@ button.secondary:hover {
   background: var(--unknownBg) !important;
 }
 
+/* Give status cells a slightly stronger “reference sheet” box feel */
+.cell.v-yes,
+.cell.v-unknown {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
 /* Modal */
 .modalOverlay {
   position: fixed;
@@ -758,6 +772,15 @@ button.secondary:hover {
     print-color-adjust: exact;
   }
 
+  /* Slightly stronger fills for printed legibility */
+  .cell.v-yes {
+    background: #d7f2de !important;
+  }
+
+  .cell.v-unknown {
+    background: #ffeab8 !important;
+  }
+
   .printHeader {
     display: block;
     border: 1px solid #ddd;
@@ -808,8 +831,12 @@ button.secondary:hover {
   }
 
   .printLegend {
-    font-size: 10.5px;
-    gap: 8px;
+    font-size: 10px;
+    gap: 6px;
+  }
+
+  .legendTitle {
+    font-size: 9px;
   }
 
   .sectionTitle {

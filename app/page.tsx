@@ -741,14 +741,15 @@ export default function HomePage() {
               </div>
 
               <div className="printLegend" aria-label="Legend">
-                <div className="legendItem">
-                  <span className="legendSwatch yes" aria-hidden="true" /> Yes
+                <div className="legendTitle">Legend</div>
+                <div className="legendItem" title="Contains allergen">
+                  <span className="legendSwatch yes" aria-hidden="true" /> Y
                 </div>
-                <div className="legendItem">
-                  <span className="legendSwatch no" aria-hidden="true" /> No
+                <div className="legendItem" title="Does not contain allergen">
+                  <span className="legendSwatch no" aria-hidden="true" /> N
                 </div>
-                <div className="legendItem">
-                  <span className="legendSwatch unknown" aria-hidden="true" /> Unknown
+                <div className="legendItem" title="Unknown / not listed">
+                  <span className="legendSwatch unknown" aria-hidden="true" /> ?
                 </div>
               </div>
             </div>
