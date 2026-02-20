@@ -471,6 +471,44 @@ button.secondary:hover {
   color: var(--muted);
 }
 
+.printLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 11px;
+  color: var(--foreground);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendSwatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--chipBorder);
+  box-sizing: border-box;
+}
+
+.legendSwatch.yes {
+  background: var(--yesBg);
+}
+
+.legendSwatch.no {
+  background: #fff;
+}
+
+.legendSwatch.unknown {
+  background: var(--unknownBg);
+}
+
 .printQrBigLabel {
   font-size: 11px;
   color: var(--muted);
@@ -710,6 +748,42 @@ button.secondary:hover {
     border: none;
     border-radius: 0;
     padding: 0;
+  }
+
+  .printHeader {
+    margin-bottom: 8px;
+  }
+
+  .printHeaderInner {
+    padding: 10px 10px;
+  }
+
+  .printTitle {
+    font-size: 17px;
+  }
+
+  .printSub {
+    font-size: 11px;
+    margin-top: 3px;
+  }
+
+  .printLegend {
+    font-size: 10.5px;
+    gap: 8px;
+  }
+
+  .sectionTitle {
+    margin: 8px 0 6px;
+    font-size: 13px;
+  }
+
+  .table {
+    font-size: 11px;
+  }
+
+  .table th,
+  .table td {
+    padding: 4px 6px;
   }
 
   .table th {

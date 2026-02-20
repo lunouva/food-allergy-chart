@@ -739,6 +739,18 @@ export default function HomePage() {
                 <div className="printTitle">Food Allergies &amp; Sensitivities</div>
                 <div className="printSub">Cold Stone Creamery (reference sheet) • Printed: {printedAt}</div>
               </div>
+
+              <div className="printLegend" aria-label="Legend">
+                <div className="legendItem">
+                  <span className="legendSwatch yes" aria-hidden="true" /> Yes
+                </div>
+                <div className="legendItem">
+                  <span className="legendSwatch no" aria-hidden="true" /> No
+                </div>
+                <div className="legendItem">
+                  <span className="legendSwatch unknown" aria-hidden="true" /> Unknown
+                </div>
+              </div>
             </div>
           </div>
 
