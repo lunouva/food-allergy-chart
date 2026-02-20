@@ -15,7 +15,10 @@
   --chipBorder: #d7d7d7;
   --chipOnBg: #111111;
   --chipOnFg: #ffffff;
-  --tableHead: #f3f3f3;
+  /* Spreadsheet-like header bar */
+  --tableHead: #111111;
+  --tableHeadFg: #ffffff;
+
   --yesBg: #e7f7ec;
   --unknownBg: #fff6db;
 
@@ -42,6 +45,7 @@
     --chipOnBg: #ededed;
     --chipOnFg: #0b0b0b;
     --tableHead: #1a1a1a;
+    --tableHeadFg: #ffffff;
     --yesBg: #12301d;
     --unknownBg: #3a2f12;
   }
@@ -490,10 +494,10 @@ button.secondary:hover {
 }
 
 .legendSwatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 4px;
-  border: 1px solid var(--chipBorder);
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
   box-sizing: border-box;
 }
 
@@ -503,6 +507,15 @@ button.secondary:hover {
 
 .legendSwatch.no {
   background: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .legendSwatch {
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .legendSwatch.no {
+    background: transparent;
+  }
 }
 
 .legendSwatch.unknown {
@@ -525,9 +538,16 @@ button.secondary:hover {
 }
 
 .sectionTitle {
-  font-size: 14px;
-  font-weight: 800;
-  margin: 10px 0 8px;
+  font-size: 13px;
+  font-weight: 900;
+  margin: 12px 0 8px;
+  padding: 6px 8px;
+  background: var(--brandRed);
+  color: #fff;
+  border: 1px solid var(--brandRed2);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .printFooter {
@@ -607,9 +627,12 @@ button.secondary:hover {
 
 .table th {
   background: var(--tableHead);
+  color: var(--tableHeadFg);
   text-align: left;
   position: sticky;
   top: 0;
+  font-weight: 900;
+  letter-spacing: 0.02em;
 }
 
 .colFlavor {
@@ -774,7 +797,9 @@ button.secondary:hover {
 
   .sectionTitle {
     margin: 8px 0 6px;
-    font-size: 13px;
+    font-size: 12px;
+    padding: 5px 6px;
+    border: none;
   }
 
   .table {
