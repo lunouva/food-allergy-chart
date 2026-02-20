@@ -57,7 +57,17 @@ function safeParseJson<T>(s: string | null): T | null {
 }
 
 function toBase64Url(s: string) {
-  const b64 = typeof window === 'undefined' ? Buffer.from(s, 'utf8').toString('base64') : btoa(s);
+  // Must be UTF-8 safe (flavor names include ™ and other non-Latin1 chars).
+  const b64 =
+    typeof window === 'undefined'
+      ? Buffer.from(s, 'utf8').toString('base64')
+      : (() => {
+          const bytes = new TextEncoder().encode(s);
+          let bin = '';
+          for (const b of bytes) bin += String.fromCharCode(b);
+          return btoa(bin);
+        })();
+
   return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
@@ -65,7 +75,13 @@ function fromBase64Url(s: string) {
   const b64 = s.replace(/-/g, '+').replace(/_/g, '/');
   const pad = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
   const full = b64 + pad;
-  return typeof window === 'undefined' ? Buffer.from(full, 'base64').toString('utf8') : atob(full);
+
+  if (typeof window === 'undefined') return Buffer.from(full, 'base64').toString('utf8');
+
+  const bin = atob(full);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
 }
 
 function makeShareUrl(payload: object) {
