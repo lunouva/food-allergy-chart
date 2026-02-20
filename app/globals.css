@@ -432,18 +432,29 @@ button.secondary:hover {
 
   .qrOnlyCard {
     min-height: 9.5in;
+    width: 100%;
+    max-width: 7.5in;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 14px;
-    padding: 28px;
+    text-align: center;
+    gap: 18px;
+    padding: 30px;
     border: 2px solid #111;
     border-radius: 18px;
   }
 
   .qrOnlyTitle {
-    font-size: 28px;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+  }
+
+  .qrOnlySubTop {
+    font-size: 15px;
+    line-height: 1.25;
+    max-width: 6.5in;
   }
 
   .qrOnlyQr {
@@ -452,9 +463,15 @@ button.secondary:hover {
     padding: 18px;
   }
 
+  .qrOnlySub {
+    font-size: 11px;
+    line-height: 1.25;
+    max-width: 6.5in;
+  }
+
   .qrBig {
-    width: 220px;
-    height: 220px;
+    width: 230px;
+    height: 230px;
   }
 }
 
