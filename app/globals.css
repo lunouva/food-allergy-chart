@@ -291,6 +291,33 @@ button.secondary:hover {
   background: var(--panel);
 }
 
+@media print {
+  .qrOnlyWrap {
+    border: none;
+    border-radius: 0;
+    page-break-inside: avoid;
+  }
+
+  .qrOnlyCard {
+    min-height: 9.5in;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    padding: 0;
+  }
+
+  .qrOnlyTitle {
+    font-size: 28px;
+  }
+
+  .qrBig {
+    width: 220px;
+    height: 220px;
+  }
+}
+
 .qrOnlyCard {
   padding: 18px;
   display: flex;
@@ -392,22 +419,7 @@ button.secondary:hover {
   word-break: break-all;
 }
 
-.printFooterGrid {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.printQrLabel {
-  font-size: 11px;
-  margin-bottom: 6px;
-  color: var(--muted);
-}
-
-.printQr {
-  text-align: right;
-}
+/* (removed old printFooterGrid/printQr styles; QR is printed via the dedicated Print QR mode) */
 
 .printFooter .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
@@ -566,6 +578,7 @@ button.secondary:hover {
     background: #fff;
   }
 
+  /* qrOnlyWrap is shown/hidden via the .hide class in JSX */
   .qrOnlyWrap {
     display: block;
     border: 1px solid #ddd;

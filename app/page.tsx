@@ -602,20 +602,13 @@ export default function HomePage() {
         </aside>
 
         <section className="right" ref={printAreaRef}>
-          <div className="printHeader">
+          <div className={printMode === 'qr' ? 'printHeader hide' : 'printHeader'}>
             <div className="brandBar" />
             <div className="printHeaderInner">
               <div>
                 <div className="printTitle">Food Allergies &amp; Sensitivities</div>
                 <div className="printSub">Cold Stone Creamery (reference sheet) • Printed: {printedAt}</div>
               </div>
-
-              {qrDataUrl ? (
-                <div className="printQrBig">
-                  <div className="printQrBigLabel">Scan for live version</div>
-                  <img className="qrBig" src={qrDataUrl} alt="QR code" />
-                </div>
-              ) : null}
             </div>
           </div>
 
@@ -707,23 +700,12 @@ export default function HomePage() {
             )}
 
             <div className="printFooter">
-              <div className="printFooterGrid">
-                <div>
-                  <div>
-                    Source: <span className="mono">{SOURCE_PDF_URL}</span>
-                  </div>
-                  <div className="disclaimer">
-                    Note: Provided for reference; ingredients and cross-contact risk can change. Verify with
-                    Cold Stone and local store practices.
-                  </div>
-                </div>
-
-                {qrDataUrl ? (
-                  <div className="printQr">
-                    <div className="printQrLabel">Live version</div>
-                    <img className="qr" src={qrDataUrl} alt="QR code" />
-                  </div>
-                ) : null}
+              <div>
+                Source: <span className="mono">{SOURCE_PDF_URL}</span>
+              </div>
+              <div className="disclaimer">
+                Note: Provided for reference; ingredients and cross-contact risk can change. Verify with Cold Stone
+                and local store practices.
               </div>
             </div>
           </div>
