@@ -564,6 +564,7 @@ export default function HomePage() {
       <header className="topbar">
         <div>
           <h1>Food Allergies and Sensitivities</h1>
+          <div className="subtitle">Printable reference sheet (based on Cold Stone’s published chart)</div>
           <div className="printed">Printed: {printedAt}</div>
         </div>
         <div className="actions no-print">
@@ -636,6 +637,7 @@ export default function HomePage() {
                     key={c}
                     type="button"
                     className={on ? 'chip chipOn' : 'chip'}
+                    aria-pressed={on}
                     onClick={() => {
                       setUi((prev) => {
                         const current = new Set(
@@ -911,6 +913,8 @@ function AddFlavorModal({
             <div className="label">Flavor name</div>
             <input
               value={name}
+              autoFocus
+              placeholder="e.g., Birthday Cake Remix"
               onChange={(e) => {
                 const v = e.target.value;
                 setName(v);
