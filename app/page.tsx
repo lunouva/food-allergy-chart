@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import QRCode from 'qrcode';
@@ -84,14 +85,20 @@ function fromBase64Url(s: string) {
   return new TextDecoder().decode(bytes);
 }
 
-function makeShareUrl(payload: object) {
+type SharePayloadV1 = {
+  v?: number;
+  selected?: unknown;
+  ui?: unknown;
+};
+
+function makeShareUrl(payload: SharePayloadV1) {
   if (typeof window === 'undefined') return '';
   const base = window.location.origin + window.location.pathname;
   const encoded = toBase64Url(JSON.stringify(payload));
   return `${base}?s=${encoded}`;
 }
 
-function readSharePayload(): { payload: any | null; error?: string } {
+function readSharePayload(): { payload: SharePayloadV1 | null; error?: string } {
   if (typeof window === 'undefined') return { payload: null };
   const params = new URLSearchParams(window.location.search);
   const s = params.get('s');
@@ -216,16 +223,37 @@ export default function HomePage() {
     return new Set(selectedArr);
   });
 
-  const [ui, setUi] = useState<{ splitByCategory: boolean; activeCategories: Category[] }>(() => {
-    if (typeof window === 'undefined') return { splitByCategory: true, activeCategories: [] };
-    const saved = safeParseJson<{ splitByCategory?: boolean; activeCategories?: unknown }>(
-      localStorage.getItem(STORAGE_UI),
-    );
+  const [ui, setUi] = useState<{
+    splitByCategory: boolean;
+    activeCategories: Category[];
+    qrPrintHeadline: string;
+    qrPrintSupport: string;
+  }>(() => {
+    const defaults = {
+      splitByCategory: true,
+      activeCategories: [] as Category[],
+      qrPrintHeadline: 'Food allergies',
+      qrPrintSupport: 'Show this chart on your phone',
+    };
+
+    if (typeof window === 'undefined') return defaults;
+
+    const saved = safeParseJson<{
+      splitByCategory?: boolean;
+      activeCategories?: unknown;
+      qrPrintHeadline?: unknown;
+      qrPrintSupport?: unknown;
+    }>(localStorage.getItem(STORAGE_UI));
+
     return {
-      splitByCategory: saved?.splitByCategory ?? true,
+      splitByCategory: saved?.splitByCategory ?? defaults.splitByCategory,
       activeCategories: Array.isArray(saved?.activeCategories)
         ? (saved?.activeCategories.map(safeCategory) as Category[])
-        : [],
+        : defaults.activeCategories,
+      qrPrintHeadline:
+        typeof saved?.qrPrintHeadline === 'string' ? saved.qrPrintHeadline : defaults.qrPrintHeadline,
+      qrPrintSupport:
+        typeof saved?.qrPrintSupport === 'string' ? saved.qrPrintSupport : defaults.qrPrintSupport,
     };
   });
 
@@ -290,16 +318,28 @@ export default function HomePage() {
 
     try {
       if (Array.isArray(payload.selected)) {
-        setSelected(new Set(payload.selected.map((x: any) => String(x))));
+        setSelected(new Set(payload.selected.map((x) => String(x))));
       }
-      if (payload.ui && typeof payload.ui === 'object') {
-        const u = payload.ui as any;
+
+      if (payload.ui && typeof payload.ui === 'object' && !Array.isArray(payload.ui)) {
+        const u = payload.ui as Partial<{
+          splitByCategory: unknown;
+          activeCategories: unknown;
+          qrPrintHeadline: unknown;
+          qrPrintSupport: unknown;
+        }>;
+
         setUi((prev) => ({
           ...prev,
-          splitByCategory: typeof u.splitByCategory === 'boolean' ? u.splitByCategory : prev.splitByCategory,
+          splitByCategory:
+            typeof u.splitByCategory === 'boolean' ? u.splitByCategory : prev.splitByCategory,
           activeCategories: Array.isArray(u.activeCategories)
             ? (u.activeCategories.map(safeCategory) as Category[])
             : prev.activeCategories,
+          qrPrintHeadline:
+            typeof u.qrPrintHeadline === 'string' ? u.qrPrintHeadline : prev.qrPrintHeadline,
+          qrPrintSupport:
+            typeof u.qrPrintSupport === 'string' ? u.qrPrintSupport : prev.qrPrintSupport,
         }));
       }
     } catch {
@@ -663,6 +703,29 @@ export default function HomePage() {
               </button>
             </div>
 
+            <div className="qrPrintBox">
+              <div className="sourceTitle">Print QR card text</div>
+              <div className="qrPrintFields">
+                <label className="field">
+                  <div className="label">Headline</div>
+                  <input
+                    value={ui.qrPrintHeadline}
+                    onChange={(e) => setUi((p) => ({ ...p, qrPrintHeadline: e.target.value }))}
+                    placeholder="Food allergies"
+                  />
+                </label>
+                <label className="field">
+                  <div className="label">Supporting text</div>
+                  <input
+                    value={ui.qrPrintSupport}
+                    onChange={(e) => setUi((p) => ({ ...p, qrPrintSupport: e.target.value }))}
+                    placeholder="Show this chart on your phone"
+                  />
+                </label>
+              </div>
+              <div className="qrPrintHint">Used in the “Print QR” output. Keep it short for the best print layout.</div>
+            </div>
+
             <div className="sourceBox">
               <div className="sourceTitle">Source</div>
               <a href={SOURCE_PDF_URL} target="_blank" rel="noreferrer">
@@ -676,7 +739,9 @@ export default function HomePage() {
                 Live QR
               </div>
               <div className="qrRow">
-                {qrDataUrl ? <img className="qr" src={qrDataUrl} alt="QR code" /> : null}
+                {qrDataUrl ? (
+                  <Image className="qr" src={qrDataUrl} alt="QR code" width={80} height={80} unoptimized />
+                ) : null}
                 <div className="qrMeta">
                   <div className="qrHint">{qrHint || 'Scan to view this exact selection on a phone.'}</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -758,9 +823,12 @@ export default function HomePage() {
           <div className={printMode === 'qr' ? 'qrOnlyWrap' : 'qrOnlyWrap hide'}>
             <div className="brandBar" />
             <div className="qrOnlyCard">
-              <div className="qrOnlyTitle">Food allergies</div>
-              {qrDataUrl ? <img className="qrBig" src={qrDataUrl} alt="QR code" /> : null}
-              <div className="qrOnlySub">Scan to view this chart on your phone</div>
+              <div className="qrOnlyTitle">{ui.qrPrintHeadline || 'Food allergies'}</div>
+              <div className="qrOnlySubTop">{ui.qrPrintSupport || 'Show this chart on your phone'}</div>
+              {qrDataUrl ? (
+                <Image className="qrBig" src={qrDataUrl} alt="QR code" width={110} height={110} unoptimized />
+              ) : null}
+              <div className="qrOnlySub">{qrHint || 'Scan to open this exact selection.'}</div>
             </div>
           </div>
 
@@ -859,6 +927,24 @@ export default function HomePage() {
               <div className="disclaimer">
                 Note: Provided for reference; ingredients and cross-contact risk can change. Verify with Cold Stone
                 and local store practices.
+              </div>
+
+              <div className="disclosures">
+                <div className="disclosuresTitle">Disclosures (cross-contact / shared equipment)</div>
+                <ul className="disclosuresList">
+                  <li>
+                    Many ingredients are handled in the same prep area. Even if an item does not list an allergen as an
+                    ingredient, cross-contact is possible.
+                  </li>
+                  <li>
+                    Ask staff about store-specific practices (e.g., whether peanut butter or nut ingredients are used at the
+                    same mixing surface, scoop rinse station, blenders, or topping bins).
+                  </li>
+                  <li>
+                    If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a clean
+                    mixing surface.
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
