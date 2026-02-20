@@ -621,8 +621,13 @@ button.secondary:hover {
 .table th,
 .table td {
   border: 1px solid var(--chipBorder);
-  padding: 6px 8px;
+  padding: 5px 6px;
   vertical-align: top;
+}
+
+/* Dense, spreadsheet-like readability */
+.table tbody tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .table th {
@@ -632,15 +637,27 @@ button.secondary:hover {
   position: sticky;
   top: 0;
   font-weight: 900;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 7px 6px;
+}
+
+.table th:not(.colFlavor) {
+  text-align: center;
 }
 
 .colFlavor {
-  width: 260px;
+  width: 280px;
 }
 
 .flavorCell {
-  font-weight: 600;
+  font-weight: 650;
+}
+
+.cell {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .empty {
@@ -650,7 +667,7 @@ button.secondary:hover {
 }
 
 .cell.v-yes {
-  background: var(--yesBg);
+  background: var(--yesBg) !important;
 }
 
 .cell.v-no {
@@ -658,7 +675,7 @@ button.secondary:hover {
 }
 
 .cell.v-unknown {
-  background: var(--unknownBg);
+  background: var(--unknownBg) !important;
 }
 
 /* Modal */
@@ -804,11 +821,13 @@ button.secondary:hover {
 
   .table {
     font-size: 11px;
+    border: 2px solid #111;
   }
 
   .table th,
   .table td {
     padding: 4px 6px;
+    border-color: #111;
   }
 
   .table th {
