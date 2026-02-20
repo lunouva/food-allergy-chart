@@ -209,6 +209,7 @@ export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [qrDataUrl, setQrDataUrl] = useState('');
+  const [printMode, setPrintMode] = useState<'full' | 'qr'>('full');
 
   const printAreaRef = useRef<HTMLDivElement | null>(null);
 
@@ -364,9 +365,24 @@ export default function HomePage() {
     setSelected(new Set(masterRows.map((r) => r.flavor)));
   }
 
+  useEffect(() => {
+    function onAfter() {
+      setPrintMode('full');
+    }
+    window.addEventListener('afterprint', onAfter);
+    return () => window.removeEventListener('afterprint', onAfter);
+  }, []);
+
   function onPrint() {
     setPrintedAt(nowLabel());
+    setPrintMode('full');
     if (!confirmIfMissing(selectedRows.length, masterFlavorCount)) return;
+    window.print();
+  }
+
+  function onPrintQr() {
+    setPrintedAt(nowLabel());
+    setPrintMode('qr');
     window.print();
   }
 
@@ -479,6 +495,7 @@ export default function HomePage() {
             Select all (master)
           </button>
           <button onClick={onDownloadPdf}>Download PDF</button>
+          <button className="secondary" onClick={onPrintQr}>Print QR</button>
           <button onClick={onPrint}>Print</button>
         </div>
       </header>
@@ -589,7 +606,7 @@ export default function HomePage() {
             <div className="brandBar" />
             <div className="printHeaderInner">
               <div>
-                <div className="printTitle">Food Allergies & Sensitivities</div>
+                <div className="printTitle">Food Allergies &amp; Sensitivities</div>
                 <div className="printSub">Cold Stone Creamery (reference sheet) • Printed: {printedAt}</div>
               </div>
 
@@ -602,7 +619,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="tableWrap">
+          <div className={printMode === 'qr' ? 'qrOnlyWrap' : 'qrOnlyWrap hide'}>
+            <div className="brandBar" />
+            <div className="qrOnlyCard">
+              <div className="qrOnlyTitle">Food allergies</div>
+              {qrDataUrl ? <img className="qrBig" src={qrDataUrl} alt="QR code" /> : null}
+              <div className="qrOnlySub">Scan to view this chart on your phone</div>
+            </div>
+          </div>
+
+          <div className={printMode === 'qr' ? 'tableWrap hide' : 'tableWrap'}>
             {outputRows.length === 0 ? (
               <table className="table">
                 <thead>
