@@ -15,7 +15,7 @@ type Allergen = (typeof ALLERGENS)[number];
 
 type AllergenValue = 'Yes' | 'No' | 'Unknown';
 
-type Category = 'Ice Cream' | 'Mix-In' | 'Cone/Bowl' | 'Other';
+type Category = 'Ice Cream' | 'Mix-In' | 'Cake' | 'Cone/Bowl' | 'Other';
 
 type FlavorRecord = {
   flavor: string;
@@ -66,7 +66,18 @@ function inferCategory(name: string): Category {
   const t = (name ?? '').toLowerCase();
 
   // Broad heuristics: the main goal is "Ice Cream" vs "Mix-In" separation.
-  if (t.includes('ice cream') || t.includes('sorbet')) return 'Ice Cream';
+  if (t.includes('ice cream') || t.includes('sorbet') || t.includes('frozen dessert')) return 'Ice Cream';
+
+  if (
+    t.includes('cake') ||
+    t.includes('brownie') ||
+    t.includes('cupcake') ||
+    t.includes('muffin') ||
+    t.includes('pie')
+  ) {
+    return 'Cake';
+  }
+
   if (t.includes('cone') || t.includes('waffle') || t.includes('bowl')) return 'Cone/Bowl';
 
   // Many non-ice-cream items here are mix-ins, toppings, or inclusions.
@@ -99,7 +110,7 @@ function inferCategory(name: string): Category {
 }
 
 function safeCategory(v: unknown): Category {
-  if (v === 'Ice Cream' || v === 'Mix-In' || v === 'Cone/Bowl' || v === 'Other') return v;
+  if (v === 'Ice Cream' || v === 'Mix-In' || v === 'Cake' || v === 'Cone/Bowl' || v === 'Other') return v;
   return 'Mix-In';
 }
 
@@ -107,6 +118,7 @@ function groupByCategory(rows: FlavorRecord[]): Record<Category, FlavorRecord[]>
   const out: Record<Category, FlavorRecord[]> = {
     'Ice Cream': [],
     'Mix-In': [],
+    Cake: [],
     'Cone/Bowl': [],
     Other: [],
   };
@@ -623,6 +635,7 @@ function AddFlavorModal({
             <select value={category} onChange={(e) => setCategory(e.target.value as Category)}>
               <option value="Ice Cream">Ice Cream</option>
               <option value="Mix-In">Mix-In</option>
+              <option value="Cake">Cake</option>
               <option value="Cone/Bowl">Cone/Bowl</option>
               <option value="Other">Other</option>
             </select>

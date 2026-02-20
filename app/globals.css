@@ -1,12 +1,40 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --muted: #555;
+  --panel: #ffffff;
+  --panelAlt: #fafafa;
+  --border: #e5e5e5;
+  --borderSoft: #eee;
+  --appBg: #f6f6f6;
+  --chipBg: #ffffff;
+  --chipFg: #111111;
+  --chipBorder: #d7d7d7;
+  --chipOnBg: #111111;
+  --chipOnFg: #ffffff;
+  --tableHead: #f3f3f3;
+  --yesBg: #e7f7ec;
+  --unknownBg: #fff6db;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #0b0b0b;
     --foreground: #ededed;
+    --muted: #a9a9a9;
+    --panel: #121212;
+    --panelAlt: #171717;
+    --border: #2a2a2a;
+    --borderSoft: #242424;
+    --appBg: #0f0f0f;
+    --chipBg: #121212;
+    --chipFg: #ededed;
+    --chipBorder: #2a2a2a;
+    --chipOnBg: #ededed;
+    --chipOnFg: #0b0b0b;
+    --tableHead: #1a1a1a;
+    --yesBg: #12301d;
+    --unknownBg: #3a2f12;
   }
 }
 
@@ -45,8 +73,8 @@ a {
 
 .page {
   min-height: 100vh;
-  background: #f6f6f6;
-  color: #111;
+  background: var(--appBg);
+  color: var(--foreground);
 }
 
 .topbar {
@@ -55,8 +83,8 @@ a {
   justify-content: space-between;
   gap: 16px;
   padding: 18px 22px;
-  border-bottom: 1px solid #e5e5e5;
-  background: #fff;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
 }
 
 .topbar h1 {
@@ -67,7 +95,7 @@ a {
 .printed {
   margin-top: 6px;
   font-size: 12px;
-  color: #555;
+  color: var(--muted);
 }
 
 .actions {
@@ -80,9 +108,9 @@ a {
 
 button {
   appearance: none;
-  border: 1px solid #111;
-  background: #111;
-  color: #fff;
+  border: 1px solid var(--chipOnBg);
+  background: var(--chipOnBg);
+  color: var(--chipOnFg);
   padding: 8px 10px;
   border-radius: 8px;
   font-size: 13px;
@@ -90,13 +118,13 @@ button {
 }
 
 button.secondary {
-  background: #fff;
-  color: #111;
-  border-color: #d7d7d7;
+  background: var(--panel);
+  color: var(--foreground);
+  border-color: var(--chipBorder);
 }
 
 button.secondary:hover {
-  background: #f4f4f4;
+  background: var(--panelAlt);
 }
 
 .split {
@@ -107,8 +135,8 @@ button.secondary:hover {
 }
 
 .left {
-  background: #fff;
-  border: 1px solid #e8e8e8;
+  background: var(--panel);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px;
   height: calc(100vh - 110px);
@@ -128,13 +156,15 @@ button.secondary:hover {
   flex: 1;
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid var(--chipBorder);
   font-size: 14px;
+  background: var(--panel);
+  color: var(--foreground);
 }
 
 .meta {
   font-size: 12px;
-  color: #666;
+  color: var(--muted);
   min-width: 70px;
   text-align: right;
 }
@@ -142,7 +172,7 @@ button.secondary:hover {
 .list {
   flex: 1;
   overflow: auto;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--borderSoft);
   padding-top: 10px;
 }
 
@@ -161,8 +191,8 @@ button.secondary:hover {
   font-size: 11px;
   padding: 2px 6px;
   border-radius: 999px;
-  border: 1px solid #ddd;
-  color: #444;
+  border: 1px solid var(--chipBorder);
+  color: var(--muted);
 }
 
 .filters {
@@ -200,26 +230,26 @@ button.secondary:hover {
 }
 
 .chip {
-  background: #fff;
-  color: #111;
-  border: 1px solid #d7d7d7;
+  background: var(--chipBg);
+  color: var(--chipFg);
+  border: 1px solid var(--chipBorder);
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
 }
 
 .chipOn {
-  background: #111;
-  color: #fff;
-  border-color: #111;
+  background: var(--chipOnBg);
+  color: var(--chipOnFg);
+  border-color: var(--chipOnBg);
 }
 
 .sourceBox {
   margin-top: 10px;
   padding: 10px;
-  border: 1px solid #eee;
+  border: 1px solid var(--borderSoft);
   border-radius: 10px;
-  background: #fafafa;
+  background: var(--panelAlt);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -228,12 +258,12 @@ button.secondary:hover {
 
 .sourceTitle {
   font-weight: 700;
-  color: #333;
+  color: var(--foreground);
 }
 
 .sourceBox a {
   text-decoration: underline;
-  color: #111;
+  color: var(--foreground);
 }
 
 .sectionTitle {
@@ -266,8 +296,8 @@ button.secondary:hover {
 }
 
 .right {
-  background: #fff;
-  border: 1px solid #e8e8e8;
+  background: var(--panel);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px;
   overflow: auto;
@@ -281,13 +311,13 @@ button.secondary:hover {
 
 .table th,
 .table td {
-  border: 1px solid #dcdcdc;
+  border: 1px solid var(--chipBorder);
   padding: 6px 8px;
   vertical-align: top;
 }
 
 .table th {
-  background: #f3f3f3;
+  background: var(--tableHead);
   text-align: left;
   position: sticky;
   top: 0;
@@ -303,20 +333,20 @@ button.secondary:hover {
 
 .empty {
   padding: 16px;
-  color: #666;
+  color: var(--muted);
   text-align: center;
 }
 
 .cell.v-yes {
-  background: #e7f7ec;
+  background: var(--yesBg);
 }
 
 .cell.v-no {
-  background: #fff;
+  background: transparent;
 }
 
 .cell.v-unknown {
-  background: #fff6db;
+  background: var(--unknownBg);
 }
 
 /* Modal */
@@ -333,16 +363,16 @@ button.secondary:hover {
 .modal {
   width: 760px;
   max-width: 100%;
-  background: #fff;
+  background: var(--panel);
   border-radius: 12px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid var(--border);
   overflow: hidden;
 }
 
 .modalHeader,
 .modalFooter {
   padding: 12px 14px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--borderSoft);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -351,7 +381,7 @@ button.secondary:hover {
 
 .modalFooter {
   border-bottom: none;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--borderSoft);
   justify-content: flex-end;
 }
 
@@ -365,7 +395,7 @@ button.secondary:hover {
 
 .field .label {
   font-size: 12px;
-  color: #555;
+  color: var(--muted);
   margin-bottom: 6px;
 }
 
@@ -374,7 +404,9 @@ button.secondary:hover {
   width: 100%;
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid var(--chipBorder);
+  background: var(--panel);
+  color: var(--foreground);
 }
 
 .grid {
