@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import QRCode from 'qrcode';
 
 const ALLERGENS = ['Egg', 'Milk', 'Peanuts', 'Sesame', 'Soy', 'Tree Nuts', 'Wheat'] as const;
 
@@ -50,6 +51,37 @@ function safeParseJson<T>(s: string | null): T | null {
   if (!s) return null;
   try {
     return JSON.parse(s) as T;
+  } catch {
+    return null;
+  }
+}
+
+function toBase64Url(s: string) {
+  const b64 = typeof window === 'undefined' ? Buffer.from(s, 'utf8').toString('base64') : btoa(s);
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function fromBase64Url(s: string) {
+  const b64 = s.replace(/-/g, '+').replace(/_/g, '/');
+  const pad = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
+  const full = b64 + pad;
+  return typeof window === 'undefined' ? Buffer.from(full, 'base64').toString('utf8') : atob(full);
+}
+
+function makeShareUrl(payload: object) {
+  if (typeof window === 'undefined') return '';
+  const base = window.location.origin + window.location.pathname;
+  const encoded = toBase64Url(JSON.stringify(payload));
+  return `${base}?s=${encoded}`;
+}
+
+function readSharePayload(): any | null {
+  if (typeof window === 'undefined') return null;
+  const params = new URLSearchParams(window.location.search);
+  const s = params.get('s');
+  if (!s) return null;
+  try {
+    return safeParseJson(fromBase64Url(s));
   } catch {
     return null;
   }
@@ -175,6 +207,8 @@ export default function HomePage() {
 
   const [printedAt, setPrintedAt] = useState(() => nowLabel());
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [qrDataUrl, setQrDataUrl] = useState('');
 
   const printAreaRef = useRef<HTMLDivElement | null>(null);
 
@@ -207,6 +241,30 @@ export default function HomePage() {
     };
   }, []);
 
+  // Load shared selection from URL (?s=...)
+  useEffect(() => {
+    const payload = readSharePayload();
+    if (!payload) return;
+
+    try {
+      if (Array.isArray(payload.selected)) {
+        setSelected(new Set(payload.selected.map((x: any) => String(x))));
+      }
+      if (payload.ui && typeof payload.ui === 'object') {
+        const u = payload.ui as any;
+        setUi((prev) => ({
+          ...prev,
+          splitByCategory: typeof u.splitByCategory === 'boolean' ? u.splitByCategory : prev.splitByCategory,
+          activeCategories: Array.isArray(u.activeCategories)
+            ? (u.activeCategories.map(safeCategory) as Category[])
+            : prev.activeCategories,
+        }));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // localStorage is loaded via the useState() initializers above.
 
   // Persist localStorage
@@ -222,6 +280,34 @@ export default function HomePage() {
   useEffect(() => {
     localStorage.setItem(STORAGE_UI, JSON.stringify(ui));
   }, [ui]);
+
+  // Share URL + QR (auto updates as selection changes)
+  useEffect(() => {
+    const url = makeShareUrl({ v: 1, selected: Array.from(selected), ui });
+    setShareUrl(url);
+
+    let cancelled = false;
+    (async () => {
+      if (!url) {
+        setQrDataUrl('');
+        return;
+      }
+      try {
+        const dataUrl = await QRCode.toDataURL(url, {
+          margin: 1,
+          width: 180,
+          errorCorrectionLevel: 'M',
+        });
+        if (!cancelled) setQrDataUrl(dataUrl);
+      } catch {
+        if (!cancelled) setQrDataUrl('');
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selected, ui]);
 
   const allRows: FlavorRecord[] = useMemo(() => {
     const masters: FlavorRecord[] = masterRows.map((r) => ({ ...r, source: 'master' }));
@@ -463,6 +549,19 @@ export default function HomePage() {
               <a href={SOURCE_URL} target="_blank" rel="noreferrer">
                 Nutrition page
               </a>
+
+              <div className="sourceTitle" style={{ marginTop: 6 }}>
+                Live QR
+              </div>
+              <div className="qrRow">
+                {qrDataUrl ? <img className="qr" src={qrDataUrl} alt="QR code" /> : null}
+                <div className="qrMeta">
+                  <div className="qrHint">Scan to view this exact selection on a phone.</div>
+                  <a href={shareUrl} target="_blank" rel="noreferrer" className="qrLink">
+                    {shareUrl}
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -565,12 +664,23 @@ export default function HomePage() {
             )}
 
             <div className="printFooter">
-              <div>
-                Source: <span className="mono">{SOURCE_PDF_URL}</span>
-              </div>
-              <div className="disclaimer">
-                Note: Provided for reference; ingredients and cross-contact risk can change. Verify with
-                Cold Stone and local store practices.
+              <div className="printFooterGrid">
+                <div>
+                  <div>
+                    Source: <span className="mono">{SOURCE_PDF_URL}</span>
+                  </div>
+                  <div className="disclaimer">
+                    Note: Provided for reference; ingredients and cross-contact risk can change. Verify with
+                    Cold Stone and local store practices.
+                  </div>
+                </div>
+
+                {qrDataUrl ? (
+                  <div className="printQr">
+                    <div className="printQrLabel">Live version</div>
+                    <img className="qr" src={qrDataUrl} alt="QR code" />
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>

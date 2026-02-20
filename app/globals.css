@@ -275,7 +275,53 @@ button.secondary:hover {
 .printFooter {
   margin-top: 12px;
   font-size: 11px;
-  color: #444;
+  color: var(--muted);
+}
+
+.qrRow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.qr {
+  width: 80px;
+  height: 80px;
+  border: 1px solid var(--borderSoft);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.qrMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.qrHint {
+  color: var(--muted);
+}
+
+.qrLink {
+  word-break: break-all;
+}
+
+.printFooterGrid {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.printQrLabel {
+  font-size: 11px;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+.printQr {
+  text-align: right;
 }
 
 .printFooter .mono {
