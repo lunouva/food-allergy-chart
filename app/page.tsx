@@ -930,6 +930,28 @@ export default function HomePage() {
             )}
 
             <div className="printFooter">
+              {qrDataUrl ? (
+                <div className="printQrCard" aria-label="QR code card">
+                  <div className="printQrText">
+                    <div className="printQrHeadline">{ui.qrPrintHeadline || 'Food allergies'}</div>
+                    <div className="printQrSupport" style={{ whiteSpace: 'pre-wrap' }}>
+                      {ui.qrPrintSupport || 'Show this chart on your phone'}
+                    </div>
+                    <div className="printQrHint">{qrHint || 'Scan to open this exact selection.'}</div>
+                  </div>
+                  <div className="printQrCode">
+                    <Image
+                      className="printQrImg"
+                      src={qrDataUrl}
+                      alt="QR code"
+                      width={96}
+                      height={96}
+                      unoptimized
+                    />
+                  </div>
+                </div>
+              ) : null}
+
               <div>
                 Source: <span className="mono">{SOURCE_PDF_URL}</span>
               </div>
