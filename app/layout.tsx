@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Roboto, Roboto_Condensed } from 'next/font/google';
+import { Roboto, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
 const bodyFont = Roboto({
@@ -8,7 +8,7 @@ const bodyFont = Roboto({
   weight: ['300', '400', '500', '700', '900'],
 });
 
-const displayFont = Roboto_Condensed({
+const displayFont = Playfair_Display({
   variable: '--font-display',
   subsets: ['latin'],
   weight: ['400', '700', '900'],

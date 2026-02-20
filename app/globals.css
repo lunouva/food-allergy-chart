@@ -6,7 +6,10 @@
   --panelAlt: #fafafa;
   --border: #e5e5e5;
   --borderSoft: #eee;
-  --appBg: #f6f6f6;
+
+  /* Slightly warmer "cream" page background to match Cold Stone vibe */
+  --appBg: #fbf7ee;
+
   --chipBg: #ffffff;
   --chipFg: #111111;
   --chipBorder: #d7d7d7;
@@ -17,8 +20,8 @@
   --unknownBg: #fff6db;
 
   /* Cold Stone-ish accents (print-friendly) */
-  --brandRed: #ce2f2f;
-  --brandRed2: #b5121b;
+  --brandRed: #b5121b;
+  --brandRed2: #8f0d14;
   --brandCream: #f7f0df;
   --brandInk: #231f20;
 }
@@ -117,18 +120,23 @@ a {
 
 button {
   appearance: none;
-  border: 1px solid var(--brandRed);
-  background: var(--brandRed);
+  border: 1px solid var(--brandRed2);
+  background: linear-gradient(180deg, var(--brandRed), var(--brandRed2));
   color: #fff;
   padding: 8px 10px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
 }
 
 button:hover {
-  filter: brightness(0.95);
+  filter: brightness(0.97);
+}
+
+button:focus-visible {
+  outline: 3px solid rgba(181, 18, 27, 0.25);
+  outline-offset: 2px;
 }
 
 button.secondary {
@@ -210,7 +218,17 @@ button.secondary:hover {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 2px;
+  padding: 8px 6px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.row:hover {
+  background: var(--panelAlt);
+}
+
+.row input {
+  cursor: pointer;
 }
 
 .flavorName {
@@ -289,12 +307,27 @@ button.secondary:hover {
   margin-top: 10px;
   padding: 10px;
   border: 1px solid var(--borderSoft);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--panelAlt);
   display: flex;
   flex-direction: column;
   gap: 6px;
   font-size: 12px;
+}
+
+.shareDetails {
+  margin-top: 6px;
+}
+
+.shareDetails summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 700;
+  user-select: none;
+}
+
+.shareDetails[open] summary {
+  margin-bottom: 6px;
 }
 
 .sourceTitle {
@@ -317,7 +350,7 @@ button.secondary:hover {
   border: 1px solid var(--borderSoft);
   border-radius: 12px;
   overflow: hidden;
-  background: var(--panelAlt);
+  background: var(--brandCream);
 }
 
 .qrOnlyWrap {

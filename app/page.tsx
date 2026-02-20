@@ -683,9 +683,13 @@ export default function HomePage() {
                     </button>
                     {copyHint ? <span style={{ fontSize: 12, color: 'var(--muted)' }}>{copyHint}</span> : null}
                   </div>
-                  <a href={shareUrl} target="_blank" rel="noreferrer" className="qrLink">
-                    {shareUrl}
-                  </a>
+
+                  <details className="shareDetails">
+                    <summary>Show share link</summary>
+                    <a href={shareUrl} target="_blank" rel="noreferrer" className="qrLink">
+                      {shareUrl}
+                    </a>
+                  </details>
                 </div>
               </div>
             </div>
@@ -876,8 +880,24 @@ function AddFlavorModal({
     setAllergens((prev) => ({ ...prev, [a]: v }));
   }
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose]);
+
   return (
-    <div className="modalOverlay" role="dialog" aria-modal="true">
+    <div
+      className="modalOverlay"
+      role="dialog"
+      aria-modal="true"
+      onMouseDown={(e) => {
+        // Click outside the modal closes.
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="modal">
         <div className="modalHeader">
           <div className="modalTitle">Add flavor</div>
