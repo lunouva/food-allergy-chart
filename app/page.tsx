@@ -6,18 +6,27 @@ import autoTable from 'jspdf-autotable';
 
 const ALLERGENS = ['Egg', 'Milk', 'Peanuts', 'Sesame', 'Soy', 'Tree Nuts', 'Wheat'] as const;
 
+const SOURCE_TITLE = 'Cold Stone Creamery® — Food Allergies and Sensitivities';
+const SOURCE_URL = 'https://www.coldstonecreamery.com/nutrition/index.html';
+const SOURCE_PDF_URL =
+  'https://www.coldstonecreamery.com/nutrition/pdf/CSC_Food%20Allergies%20and%20Sensitivities.pdf';
+
 type Allergen = (typeof ALLERGENS)[number];
 
 type AllergenValue = 'Yes' | 'No' | 'Unknown';
 
+type Category = 'Ice Cream' | 'Mix-In' | 'Cone/Bowl' | 'Other';
+
 type FlavorRecord = {
   flavor: string;
+  category: Category;
   allergens: Record<Allergen, AllergenValue>;
   source: 'master' | 'manual';
 };
 
 const STORAGE_SELECTED = 'fac_selected_flavors_v1';
-const STORAGE_MANUAL = 'fac_manual_flavors_v1';
+const STORAGE_MANUAL = 'fac_manual_flavors_v2';
+const STORAGE_UI = 'fac_ui_v1';
 
 function nowLabel(d = new Date()) {
   // Local, readable timestamp
@@ -53,13 +62,68 @@ function confirmIfMissing(selectedCount: number, totalCount: number) {
   return window.confirm('Do you see every flavor you carry?');
 }
 
+function inferCategory(name: string): Category {
+  const t = (name ?? '').toLowerCase();
+
+  // Broad heuristics: the main goal is "Ice Cream" vs "Mix-In" separation.
+  if (t.includes('ice cream') || t.includes('sorbet')) return 'Ice Cream';
+  if (t.includes('cone') || t.includes('waffle') || t.includes('bowl')) return 'Cone/Bowl';
+
+  // Many non-ice-cream items here are mix-ins, toppings, or inclusions.
+  if (
+    t.includes('cookies') ||
+    t.includes('cookie') ||
+    t.includes('sprinkles') ||
+    t.includes('chips') ||
+    t.includes('nuts') ||
+    t.includes('almonds') ||
+    t.includes('walnuts') ||
+    t.includes('pecans') ||
+    t.includes('cashews') ||
+    t.includes('pistach') ||
+    t.includes('peanuts') ||
+    t.includes('m&m') ||
+    t.includes('oreo') ||
+    t.includes('fudge') ||
+    t.includes('ganache') ||
+    t.includes('caramel') ||
+    t.includes('marshmallow') ||
+    t.includes('whipped') ||
+    t.includes('topping')
+  ) {
+    return 'Mix-In';
+  }
+
+  // Default: Mix-In (to keep ice cream separate).
+  return 'Mix-In';
+}
+
+function safeCategory(v: unknown): Category {
+  if (v === 'Ice Cream' || v === 'Mix-In' || v === 'Cone/Bowl' || v === 'Other') return v;
+  return 'Mix-In';
+}
+
+function groupByCategory(rows: FlavorRecord[]): Record<Category, FlavorRecord[]> {
+  const out: Record<Category, FlavorRecord[]> = {
+    'Ice Cream': [],
+    'Mix-In': [],
+    'Cone/Bowl': [],
+    Other: [],
+  };
+  for (const r of rows) out[r.category]?.push(r);
+  for (const k of Object.keys(out) as Category[]) {
+    out[k] = out[k].sort((a, b) => a.flavor.localeCompare(b.flavor));
+  }
+  return out;
+}
+
 export default function HomePage() {
   const [search, setSearch] = useState('');
   const [masterRows, setMasterRows] = useState<Array<Omit<FlavorRecord, 'source'>>>([]);
   const [manualRows, setManualRows] = useState<FlavorRecord[]>(() => {
     if (typeof window === 'undefined') return [];
     const manual =
-      safeParseJson<Array<{ flavor: string; allergens: Record<string, AllergenValue> }>>(
+      safeParseJson<Array<{ flavor: string; category?: Category; allergens: Record<string, AllergenValue> }>>(
         localStorage.getItem(STORAGE_MANUAL),
       ) ?? [];
 
@@ -70,7 +134,8 @@ export default function HomePage() {
         const allergens = Object.fromEntries(
           ALLERGENS.map((a) => [a, (m.allergens?.[a] ?? 'Unknown') as AllergenValue]),
         ) as Record<Allergen, AllergenValue>;
-        return { flavor, allergens, source: 'manual' };
+        const category = safeCategory(m.category ?? inferCategory(flavor));
+        return { flavor, category, allergens, source: 'manual' };
       })
       .filter(Boolean) as FlavorRecord[];
 
@@ -82,6 +147,20 @@ export default function HomePage() {
     const selectedArr = safeParseJson<string[]>(localStorage.getItem(STORAGE_SELECTED)) ?? [];
     return new Set(selectedArr);
   });
+
+  const [ui, setUi] = useState<{ splitByCategory: boolean; activeCategories: Category[] }>(() => {
+    if (typeof window === 'undefined') return { splitByCategory: true, activeCategories: [] };
+    const saved = safeParseJson<{ splitByCategory?: boolean; activeCategories?: unknown }>(
+      localStorage.getItem(STORAGE_UI),
+    );
+    return {
+      splitByCategory: saved?.splitByCategory ?? true,
+      activeCategories: Array.isArray(saved?.activeCategories)
+        ? (saved?.activeCategories.map(safeCategory) as Category[])
+        : [],
+    };
+  });
+
   const [printedAt, setPrintedAt] = useState(() => nowLabel());
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -102,7 +181,9 @@ export default function HomePage() {
             ALLERGENS.map((a) => [a, normalizeValue(r.allergens?.[a] ?? 'Unknown')]),
           ) as Record<Allergen, AllergenValue>;
 
-          return { flavor: r.flavor, allergens };
+          const flavor = r.flavor;
+          const category = inferCategory(flavor);
+          return { flavor, category, allergens };
         })
         .sort((a, b) => a.flavor.localeCompare(b.flavor));
 
@@ -122,26 +203,49 @@ export default function HomePage() {
   }, [selected]);
 
   useEffect(() => {
-    const toStore = manualRows.map(({ flavor, allergens }) => ({ flavor, allergens }));
+    const toStore = manualRows.map(({ flavor, category, allergens }) => ({ flavor, category, allergens }));
     localStorage.setItem(STORAGE_MANUAL, JSON.stringify(toStore));
   }, [manualRows]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_UI, JSON.stringify(ui));
+  }, [ui]);
 
   const allRows: FlavorRecord[] = useMemo(() => {
     const masters: FlavorRecord[] = masterRows.map((r) => ({ ...r, source: 'master' }));
     return [...manualRows, ...masters].sort((a, b) => a.flavor.localeCompare(b.flavor));
   }, [masterRows, manualRows]);
 
+  const categories: Category[] = useMemo(() => {
+    const set = new Set<Category>();
+    for (const r of allRows) set.add(r.category);
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [allRows]);
+
+  const activeCategorySet = useMemo(() => {
+    const arr = ui.activeCategories.length ? ui.activeCategories : categories;
+    return new Set(arr);
+  }, [ui.activeCategories, categories]);
+
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return allRows;
-    return allRows.filter((r) => r.flavor.toLowerCase().includes(q));
-  }, [allRows, search]);
+    return allRows.filter((r) => {
+      if (!activeCategorySet.has(r.category)) return false;
+      if (!q) return true;
+      return r.flavor.toLowerCase().includes(q);
+    });
+  }, [allRows, search, activeCategorySet]);
 
   const selectedRows = useMemo(() => {
     const sel = selected;
     const rows = allRows.filter((r) => sel.has(r.flavor));
     return rows.sort((a, b) => a.flavor.localeCompare(b.flavor));
   }, [allRows, selected]);
+
+  const outputRows = useMemo(() => {
+    // What will print / export.
+    return selectedRows.filter((r) => activeCategorySet.has(r.category));
+  }, [selectedRows, activeCategorySet]);
 
   const masterFlavorCount = masterRows.length;
 
@@ -184,21 +288,61 @@ export default function HomePage() {
     doc.text(`Printed: ${printed}`, 40, 58);
 
     const head = [['Flavor', ...ALLERGENS]];
-    const body = selectedRows.map((r) => [
-      r.flavor,
-      ...ALLERGENS.map((a) => r.allergens[a] ?? 'Unknown'),
-    ]);
 
-    autoTable(doc, {
-      startY: 76,
-      head,
-      body,
-      styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
-      headStyles: { fillColor: [33, 33, 33] },
-      columnStyles: {
-        0: { cellWidth: 200 },
-      },
-    });
+    const rowsByCategory = ui.splitByCategory ? groupByCategory(outputRows) : null;
+
+    if (rowsByCategory) {
+      let first = true;
+      for (const cat of Object.keys(rowsByCategory) as Category[]) {
+        const catRows = rowsByCategory[cat];
+        if (!catRows.length) continue;
+        if (!first) doc.addPage();
+        first = false;
+
+        doc.setFontSize(12);
+        doc.text(cat, 40, 78);
+
+        const body = catRows.map((r) => [
+          r.flavor,
+          ...ALLERGENS.map((a) => r.allergens[a] ?? 'Unknown'),
+        ]);
+
+        autoTable(doc, {
+          startY: 90,
+          head,
+          body,
+          styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
+          headStyles: { fillColor: [33, 33, 33] },
+          columnStyles: {
+            0: { cellWidth: 200 },
+          },
+        });
+
+        doc.setFontSize(9);
+        doc.text(`Source: ${SOURCE_TITLE}`, 40, 740);
+        doc.text(SOURCE_PDF_URL, 40, 754);
+      }
+    } else {
+      const body = outputRows.map((r) => [
+        r.flavor,
+        ...ALLERGENS.map((a) => r.allergens[a] ?? 'Unknown'),
+      ]);
+
+      autoTable(doc, {
+        startY: 76,
+        head,
+        body,
+        styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
+        headStyles: { fillColor: [33, 33, 33] },
+        columnStyles: {
+          0: { cellWidth: 200 },
+        },
+      });
+
+      doc.setFontSize(9);
+      doc.text(`Source: ${SOURCE_TITLE}`, 40, 740);
+      doc.text(SOURCE_PDF_URL, 40, 754);
+    }
 
     doc.save(`food-allergy-chart-${new Date().toISOString().slice(0, 10)}.pdf`);
   }
@@ -253,6 +397,63 @@ export default function HomePage() {
             <div className="meta">{filteredRows.length} shown</div>
           </div>
 
+          <div className="filters">
+            <div className="filterRow">
+              <div className="filterLabel">Print / export categories</div>
+              <label className="toggle">
+                <input
+                  type="checkbox"
+                  checked={ui.splitByCategory}
+                  onChange={(e) => setUi((p) => ({ ...p, splitByCategory: e.target.checked }))}
+                />
+                <span>Split by category</span>
+              </label>
+            </div>
+
+            <div className="chips" role="group" aria-label="Category filters">
+              {categories.map((c) => {
+                const on = activeCategorySet.has(c);
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    className={on ? 'chip chipOn' : 'chip'}
+                    onClick={() => {
+                      setUi((prev) => {
+                        const current = new Set(
+                          (prev.activeCategories.length ? prev.activeCategories : categories) as Category[],
+                        );
+                        if (current.has(c)) current.delete(c);
+                        else current.add(c);
+                        return { ...prev, activeCategories: Array.from(current) };
+                      });
+                    }}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                className="chip"
+                onClick={() => setUi((p) => ({ ...p, activeCategories: [] }))}
+                title="Reset to all"
+              >
+                All
+              </button>
+            </div>
+
+            <div className="sourceBox">
+              <div className="sourceTitle">Source</div>
+              <a href={SOURCE_PDF_URL} target="_blank" rel="noreferrer">
+                {SOURCE_TITLE} (PDF)
+              </a>
+              <a href={SOURCE_URL} target="_blank" rel="noreferrer">
+                Nutrition page
+              </a>
+            </div>
+          </div>
+
           <div className="list" role="list">
             {filteredRows.map((r) => (
               <label key={`${r.source}:${r.flavor}`} className="row" role="listitem">
@@ -274,24 +475,70 @@ export default function HomePage() {
 
         <section className="right" ref={printAreaRef}>
           <div className="tableWrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th className="colFlavor">Flavor</th>
-                  {ALLERGENS.map((a) => (
-                    <th key={a}>{a}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {selectedRows.length === 0 ? (
+            {outputRows.length === 0 ? (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th className="colFlavor">Flavor</th>
+                    {ALLERGENS.map((a) => (
+                      <th key={a}>{a}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
                   <tr>
                     <td colSpan={1 + ALLERGENS.length} className="empty">
                       Select flavors on the left (or add one manually) to preview.
                     </td>
                   </tr>
-                ) : (
-                  selectedRows.map((r) => (
+                </tbody>
+              </table>
+            ) : ui.splitByCategory ? (
+              (Object.entries(groupByCategory(outputRows)) as Array<[Category, FlavorRecord[]]>).map(
+                ([cat, rows]) =>
+                  rows.length ? (
+                    <div key={cat} className="printSection">
+                      <div className="sectionTitle">{cat}</div>
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th className="colFlavor">Flavor</th>
+                            {ALLERGENS.map((a) => (
+                              <th key={a}>{a}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rows.map((r) => (
+                            <tr key={`${r.source}:${r.flavor}`}>
+                              <td className="flavorCell">{r.flavor}</td>
+                              {ALLERGENS.map((a) => (
+                                <td
+                                  key={a}
+                                  className={`cell v-${(r.allergens[a] ?? 'Unknown').toLowerCase()}`}
+                                >
+                                  {r.allergens[a] ?? 'Unknown'}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : null,
+              )
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th className="colFlavor">Flavor</th>
+                    {ALLERGENS.map((a) => (
+                      <th key={a}>{a}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {outputRows.map((r) => (
                     <tr key={`${r.source}:${r.flavor}`}>
                       <td className="flavorCell">{r.flavor}</td>
                       {ALLERGENS.map((a) => (
@@ -300,10 +547,20 @@ export default function HomePage() {
                         </td>
                       ))}
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <div className="printFooter">
+              <div>
+                Source: <span className="mono">{SOURCE_PDF_URL}</span>
+              </div>
+              <div className="disclaimer">
+                Note: Provided for reference; ingredients and cross-contact risk can change. Verify with
+                Cold Stone and local store practices.
+              </div>
+            </div>
           </div>
         </section>
       </main>
@@ -329,6 +586,7 @@ function AddFlavorModal({
   onAdd: (rec: Omit<FlavorRecord, 'source'>) => void;
 }) {
   const [name, setName] = useState('');
+  const [category, setCategory] = useState<Category>('Mix-In');
   const [allergens, setAllergens] = useState<Record<Allergen, AllergenValue>>(() =>
     Object.fromEntries(ALLERGENS.map((a) => [a, 'Unknown'])) as Record<Allergen, AllergenValue>,
   );
@@ -350,7 +608,24 @@ function AddFlavorModal({
         <div className="modalBody">
           <label className="field">
             <div className="label">Flavor name</div>
-            <input value={name} onChange={(e) => setName(e.target.value)} />
+            <input
+              value={name}
+              onChange={(e) => {
+                const v = e.target.value;
+                setName(v);
+                if (v.trim()) setCategory(inferCategory(v.trim()));
+              }}
+            />
+          </label>
+
+          <label className="field" style={{ marginTop: 10 }}>
+            <div className="label">Category</div>
+            <select value={category} onChange={(e) => setCategory(e.target.value as Category)}>
+              <option value="Ice Cream">Ice Cream</option>
+              <option value="Mix-In">Mix-In</option>
+              <option value="Cone/Bowl">Cone/Bowl</option>
+              <option value="Other">Other</option>
+            </select>
           </label>
 
           <div className="grid">
@@ -377,7 +652,7 @@ function AddFlavorModal({
                 window.alert('Please enter a flavor name.');
                 return;
               }
-              onAdd({ flavor: name.trim(), allergens });
+              onAdd({ flavor: name.trim(), category, allergens });
             }}
           >
             Add

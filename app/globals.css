@@ -165,6 +165,100 @@ button.secondary:hover {
   color: #444;
 }
 
+.filters {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  margin-bottom: 10px;
+}
+
+.filterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.filterLabel {
+  font-size: 12px;
+  color: #555;
+  font-weight: 600;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #444;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  background: #fff;
+  color: #111;
+  border: 1px solid #d7d7d7;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.chipOn {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.sourceBox {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.sourceTitle {
+  font-weight: 700;
+  color: #333;
+}
+
+.sourceBox a {
+  text-decoration: underline;
+  color: #111;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 10px 0 8px;
+}
+
+.printFooter {
+  margin-top: 12px;
+  font-size: 11px;
+  color: #444;
+}
+
+.printFooter .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  word-break: break-all;
+}
+
+.disclaimer {
+  margin-top: 6px;
+  color: #555;
+}
+
 .hint {
   margin-top: 10px;
   font-size: 12px;
@@ -323,5 +417,21 @@ button.secondary:hover {
 
   .table th {
     position: static;
+  }
+
+  .printSection {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .printSection:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .printFooter {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-top: 14px;
   }
 }
