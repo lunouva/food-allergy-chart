@@ -1016,15 +1016,42 @@ button.secondary:hover {
 
   .printQrCard {
     border: 2px solid #111;
+    padding: 14px;
+    gap: 10px;
+
+    /* Print: QR card should read top-to-bottom (text first, then QR) */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .printQrText {
+    align-items: center;
   }
 
   .printQrHeadline {
-    font-size: 14px;
+    font-size: 16px;
+  }
+
+  .printQrSupport {
+    font-size: 12px;
+  }
+
+  .printQrHint {
+    max-width: 5.5in;
+  }
+
+  .printQrCode {
+    border: 2px solid #111;
+    padding: 12px;
+    border-radius: 14px;
+    background: #fff;
   }
 
   .printQrImg {
-    width: 110px;
-    height: 110px;
+    width: 140px;
+    height: 140px;
   }
 
   .printFooter {
