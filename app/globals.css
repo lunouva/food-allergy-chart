@@ -1057,10 +1057,14 @@ button.secondary:hover {
   }
 
   .sectionTitle {
-    margin: 8px 0 6px;
+    margin: 10px 0 8px;
     font-size: 12px;
-    padding: 5px 6px;
-    border: none;
+    padding: 6px 8px;
+    border: 2px solid #111;
+    border-radius: 10px;
+    background: #f2f2f2;
+    font-weight: 900;
+    letter-spacing: -0.01em;
   }
 
   .table {
@@ -1128,6 +1132,8 @@ button.secondary:hover {
   .printQrHint {
     max-width: 6.5in;
     line-height: 1.25;
+    font-size: 10px;
+    color: #333;
   }
 
   .printQrCode {
@@ -1143,6 +1149,10 @@ button.secondary:hover {
   }
 
   .printFooter {
+    /* Make the QR + disclosures feel like its own “final page”. */
+    break-before: page;
+    page-break-before: always;
+
     break-inside: avoid;
     page-break-inside: avoid;
     margin-top: 16px;
