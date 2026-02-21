@@ -15,9 +15,9 @@ const SOURCE_PDF_URL =
 
 const DISCLOSURES_TITLE = 'Disclosures (cross-contact / shared equipment)';
 const DISCLOSURES: string[] = [
-  'This chart reflects listed ingredients only. Many ingredients are handled in the same prep area; cross-contact is possible even when an allergen is not listed.',
-  'Ask staff about store-specific practices and shared equipment (mixing surface, scoops, scoop rinse water, blenders, topping bins).',
-  'If peanut butter / nut ingredients are used in the store, cross-contact risk may be higher — ask before ordering.',
+  'This chart reflects listed ingredients only. Items may be prepared/served using shared surfaces and tools; cross-contact is possible even when an allergen is not listed.',
+  'Ask staff about store-specific practices and shared equipment (mixing surface, scoops, scoop rinse water, blenders, topping bins, etc.).',
+  'If peanut butter / nut ingredients are used in the store (including on the mixing surface), cross-contact risk may be higher — ask before ordering.',
   'If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a freshly cleaned mixing surface.',
 ];
 

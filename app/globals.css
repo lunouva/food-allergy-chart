@@ -492,7 +492,8 @@ button.secondary:hover {
     padding-left: 18px;
     font-size: 10px;
     line-height: 1.3;
-    column-count: 2;
+    /* Only a handful of bullets; 1 column reads cleaner at arm’s length. */
+    column-count: 1;
     column-gap: 18px;
   }
 
