@@ -619,9 +619,10 @@ export default function HomePage() {
     doc.setFontSize(10);
     const disclosureLines = doc.splitTextToSize(
       [
-        '• Many ingredients are handled in the same prep area. Even if an item does not list an allergen as an ingredient, cross-contact is possible.',
-        '• Ask staff about store-specific practices (e.g., whether peanut butter or nut ingredients are used at the same mixing surface, scoop rinse station, blenders, or topping bins).',
-        '• If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a clean mixing surface.',
+        '• This chart reflects listed ingredients only. Many ingredients are handled in the same prep area; cross-contact is possible even when an allergen is not listed.',
+        '• Ask staff about store-specific practices and shared equipment (mixing surface, scoops, scoop rinse water, blenders, topping bins).',
+        '• If peanut butter / nut ingredients are used in the store, cross-contact risk may be higher — ask before ordering.',
+        '• If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a freshly cleaned mixing surface.',
       ].join('\n'),
       pageW - 80,
     );
@@ -1015,16 +1016,20 @@ export default function HomePage() {
                 <div className="disclosuresTitle">Disclosures (cross-contact / shared equipment)</div>
                 <ul className="disclosuresList">
                   <li>
-                    Many ingredients are handled in the same prep area. Even if an item does not list an allergen as an
-                    ingredient, cross-contact is possible.
+                    This chart reflects listed ingredients only. Many ingredients are handled in the same prep area;
+                    cross-contact is possible even when an allergen is not listed.
                   </li>
                   <li>
-                    Ask staff about store-specific practices (e.g., whether peanut butter or nut ingredients are used at the
-                    same mixing surface, scoop rinse station, blenders, or topping bins).
+                    Ask staff about store-specific practices and shared equipment (mixing surface, scoops, scoop rinse
+                    water, blenders, topping bins).
                   </li>
                   <li>
-                    If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a clean
-                    mixing surface.
+                    If peanut butter / nut ingredients are used in the store, cross-contact risk may be higher — ask before
+                    ordering.
+                  </li>
+                  <li>
+                    If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a freshly
+                    cleaned mixing surface.
                   </li>
                 </ul>
               </div>
