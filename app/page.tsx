@@ -13,6 +13,14 @@ const SOURCE_URL = 'https://www.coldstonecreamery.com/nutrition/index.html';
 const SOURCE_PDF_URL =
   'https://www.coldstonecreamery.com/nutrition/pdf/CSC_Food%20Allergies%20and%20Sensitivities.pdf';
 
+const DISCLOSURES_TITLE = 'Disclosures (cross-contact / shared equipment)';
+const DISCLOSURES: string[] = [
+  'This chart reflects listed ingredients only. Many ingredients are handled in the same prep area; cross-contact is possible even when an allergen is not listed.',
+  'Ask staff about store-specific practices and shared equipment (mixing surface, scoops, scoop rinse water, blenders, topping bins).',
+  'If peanut butter / nut ingredients are used in the store, cross-contact risk may be higher — ask before ordering.',
+  'If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a freshly cleaned mixing surface.',
+];
+
 type Allergen = (typeof ALLERGENS)[number];
 
 type AllergenValue = 'Yes' | 'No' | 'Unknown';
@@ -614,19 +622,16 @@ export default function HomePage() {
 
     // Disclosures
     doc.setFontSize(12);
-    doc.text('Disclosures (cross-contact / shared equipment)', 40, 400);
+    doc.text(DISCLOSURES_TITLE, 40, 400);
 
     doc.setFontSize(10);
-    const disclosureLines = doc.splitTextToSize(
-      [
-        '• This chart reflects listed ingredients only. Many ingredients are handled in the same prep area; cross-contact is possible even when an allergen is not listed.',
-        '• Ask staff about store-specific practices and shared equipment (mixing surface, scoops, scoop rinse water, blenders, topping bins).',
-        '• If peanut butter / nut ingredients are used in the store, cross-contact risk may be higher — ask before ordering.',
-        '• If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a freshly cleaned mixing surface.',
-      ].join('\n'),
-      pageW - 80,
-    );
-    doc.text(disclosureLines, 40, 420);
+    let y = 420;
+    for (const item of DISCLOSURES) {
+      const bullet = `• ${item}`;
+      const lines = doc.splitTextToSize(bullet, pageW - 80);
+      doc.text(lines, 40, y);
+      y += lines.length * 14;
+    }
 
     doc.setFontSize(9);
     doc.text(`Source: ${SOURCE_TITLE}`, 40, 740);
@@ -1013,24 +1018,11 @@ export default function HomePage() {
               </div>
 
               <div className="disclosures">
-                <div className="disclosuresTitle">Disclosures (cross-contact / shared equipment)</div>
+                <div className="disclosuresTitle">{DISCLOSURES_TITLE}</div>
                 <ul className="disclosuresList">
-                  <li>
-                    This chart reflects listed ingredients only. Many ingredients are handled in the same prep area;
-                    cross-contact is possible even when an allergen is not listed.
-                  </li>
-                  <li>
-                    Ask staff about store-specific practices and shared equipment (mixing surface, scoops, scoop rinse
-                    water, blenders, topping bins).
-                  </li>
-                  <li>
-                    If peanut butter / nut ingredients are used in the store, cross-contact risk may be higher — ask before
-                    ordering.
-                  </li>
-                  <li>
-                    If you have a severe allergy, consider avoiding mix-ins and ask for fresh gloves/clean tools and a freshly
-                    cleaned mixing surface.
-                  </li>
+                  {DISCLOSURES.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
                 </ul>
               </div>
             </div>

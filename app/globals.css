@@ -1108,5 +1108,11 @@ button.secondary:hover {
 
   .disclosuresList {
     color: #222;
+    column-count: 2;
+    column-gap: 18px;
+  }
+
+  .disclosuresList li {
+    break-inside: avoid;
   }
 }
