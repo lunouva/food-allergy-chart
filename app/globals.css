@@ -704,13 +704,19 @@ button.secondary:hover {
   border-radius: 12px;
   padding: 10px;
   background: #fff;
-  display: flex;
+
+  /* More defined hierarchy: text first, then QR, then hint */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'text qr'
+    'hint qr';
+  gap: 8px 12px;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
 }
 
 .printQrText {
+  grid-area: text;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -732,15 +738,19 @@ button.secondary:hover {
 }
 
 .printQrHint {
+  grid-area: hint;
   font-size: 10px;
   color: var(--muted);
+  line-height: 1.25;
 }
 
 .printQrCode {
+  grid-area: qr;
   flex: 0 0 auto;
   border: 1px solid var(--borderSoft);
   border-radius: 10px;
   padding: 8px;
+  background: #fff;
 }
 
 .printQrImg {
@@ -1107,7 +1117,8 @@ button.secondary:hover {
     gap: 12px;
     background: #fff;
 
-    /* Print: QR card should read top-to-bottom (text first, then QR) */
+    /* Print: QR card should read top-to-bottom (text first, then QR, then hint) */
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;

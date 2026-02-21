@@ -1003,8 +1003,8 @@ export default function HomePage() {
                     <div className="printQrSupport" style={{ whiteSpace: 'pre-wrap' }}>
                       {ui.qrPrintSupport || 'Show this chart on your phone'}
                     </div>
-                    <div className="printQrHint">{qrHint || 'Scan to open this exact selection.'}</div>
                   </div>
+
                   <div className="printQrCode">
                     <Image
                       className="printQrImg"
@@ -1015,6 +1015,8 @@ export default function HomePage() {
                       unoptimized
                     />
                   </div>
+
+                  <div className="printQrHint">{qrHint || 'Scan to open this exact selection.'}</div>
                 </div>
               ) : null}
 
