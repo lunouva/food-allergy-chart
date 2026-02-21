@@ -895,6 +895,15 @@ export default function HomePage() {
               </div>
 
               <div className="qrOnlySub">{qrHint || 'Scan to open this exact selection.'}</div>
+
+              <div className="qrOnlyDisclosures" aria-label="Disclosures">
+                <div className="qrOnlyDisclosuresTitle">{DISCLOSURES_TITLE}</div>
+                <ul className="qrOnlyDisclosuresList">
+                  {DISCLOSURES.map((t) => (
+                    <li key={t}>{t}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
 
