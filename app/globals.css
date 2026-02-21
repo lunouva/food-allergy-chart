@@ -1009,6 +1009,8 @@ button.secondary:hover {
   .table {
     font-size: 11px;
     border: 2px solid #111;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .table th,
@@ -1029,14 +1031,11 @@ button.secondary:hover {
     text-align: center;
   }
 
+  /* Don’t force every category to a new page; instead, keep sections together when possible. */
   .printSection {
-    break-after: page;
-    page-break-after: always;
-  }
-
-  .printSection:last-child {
-    break-after: auto;
-    page-break-after: auto;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 14px;
   }
 
   .printQrCard {
