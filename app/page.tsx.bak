@@ -267,35 +267,6 @@ export default function HomePage() {
 
   const [printedAt, setPrintedAt] = useState(() => nowLabel());
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingFlavor, setEditingFlavor] = useState<FlavorRecord | null>(null);
-
-  // Resizable split panel
-  const [leftWidth, setLeftWidth] = useState(360);
-  const isDragging = useRef(false);
-  const dragStartX = useRef(0);
-  const dragStartWidth = useRef(0);
-
-  function onResizeStart(e: React.MouseEvent) {
-    isDragging.current = true;
-    dragStartX.current = e.clientX;
-    dragStartWidth.current = leftWidth;
-    e.preventDefault();
-
-    function onMove(ev: MouseEvent) {
-      if (!isDragging.current) return;
-      const delta = ev.clientX - dragStartX.current;
-      setLeftWidth(Math.max(220, Math.min(700, dragStartWidth.current + delta)));
-    }
-
-    function onUp() {
-      isDragging.current = false;
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    }
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-  }
   const [shareUrl, setShareUrl] = useState('');
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [qrHint, setQrHint] = useState<string>('');
@@ -709,8 +680,8 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="split" style={{ display: 'flex', gap: 16, padding: 16, alignItems: 'flex-start' }}>
-        <aside className="left no-print" style={{ width: leftWidth, minWidth: leftWidth, flexShrink: 0 }}>
+      <main className="split">
+        <aside className="left no-print">
           <div className="searchRow">
             <input
               value={search}
@@ -873,16 +844,6 @@ export default function HomePage() {
                   />
                   <span className="flavorName">{r.flavor}</span>
                   {r.source === 'manual' && <span className="badge">Manual</span>}
-                  {r.source === 'manual' && (
-                    <button
-                      type="button"
-                      className="secondary editBtn"
-                      onClick={(e) => { e.preventDefault(); setEditingFlavor(r); }}
-                      title="Edit this entry"
-                    >
-                      Edit
-                    </button>
-                  )}
                 </label>
               ))
             )}
@@ -893,12 +854,7 @@ export default function HomePage() {
           </div>
         </aside>
 
-        <div
-          className="resizeHandle no-print"
-          onMouseDown={onResizeStart}
-          title="Drag to resize"
-        />
-        <section className="right" ref={printAreaRef} style={{ flex: 1, minWidth: 0 }}>
+        <section className="right" ref={printAreaRef}>
           <div className={printMode === 'qr' ? 'printHeader hide' : 'printHeader'}>
             <div className="brandBar" />
             <div className="printHeaderInner">
@@ -1085,14 +1041,12 @@ export default function HomePage() {
         </section>
       </main>
 
-      {(isModalOpen || editingFlavor) && (
+      {isModalOpen && (
         <AddFlavorModal
-          initial={editingFlavor ?? undefined}
-          onClose={() => { setIsModalOpen(false); setEditingFlavor(null); }}
+          onClose={() => setIsModalOpen(false)}
           onAdd={(rec) => {
             addManualFlavor(rec);
             setIsModalOpen(false);
-            setEditingFlavor(null);
           }}
         />
       )}
@@ -1103,18 +1057,14 @@ export default function HomePage() {
 function AddFlavorModal({
   onClose,
   onAdd,
-  initial,
 }: {
   onClose: () => void;
   onAdd: (rec: Omit<FlavorRecord, 'source'>) => void;
-  initial?: FlavorRecord;
 }) {
-  const [name, setName] = useState(initial?.flavor ?? '');
-  const [category, setCategory] = useState<Category>(initial?.category ?? 'Mix-In');
-  const [allergens, setAllergens] = useState<Record<Allergen, AllergenValue>>(
-    () => initial?.allergens
-      ? { ...initial.allergens }
-      : (Object.fromEntries(ALLERGENS.map((a) => [a, 'Unknown'])) as Record<Allergen, AllergenValue>),
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState<Category>('Mix-In');
+  const [allergens, setAllergens] = useState<Record<Allergen, AllergenValue>>(() =>
+    Object.fromEntries(ALLERGENS.map((a) => [a, 'Unknown'])) as Record<Allergen, AllergenValue>,
   );
 
   function setAllergen(a: Allergen, v: AllergenValue) {
@@ -1141,7 +1091,7 @@ function AddFlavorModal({
     >
       <div className="modal">
         <div className="modalHeader">
-          <div className="modalTitle">{initial ? 'Edit flavor' : 'Add flavor'}</div>
+          <div className="modalTitle">Add flavor</div>
           <button className="secondary" onClick={onClose}>
             Close
           </button>
@@ -1200,7 +1150,7 @@ function AddFlavorModal({
               onAdd({ flavor: name.trim(), category, allergens });
             }}
           >
-            {initial ? 'Save' : 'Add'}
+            Add
           </button>
         </div>
       </div>

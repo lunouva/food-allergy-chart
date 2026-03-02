@@ -174,10 +174,7 @@ button.secondary:hover {
 }
 
 .split {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 16px;
-  padding: 16px;
+  /* layout is set via inline style (flex + leftWidth) for resizable panels */
 }
 
 @media (max-width: 900px) {
@@ -1193,4 +1190,28 @@ button.secondary:hover {
   .disclosuresList li {
     break-inside: avoid;
   }
+}
+
+/* Resizable split handle */
+.resizeHandle {
+  width: 6px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  border-radius: 4px;
+  background: var(--borderSoft);
+  transition: background 0.15s;
+  align-self: stretch;
+}
+
+.resizeHandle:hover,
+.resizeHandle:active {
+  background: var(--chipBorder);
+}
+
+/* Edit button inside list rows — compact */
+.editBtn {
+  padding: 3px 8px;
+  font-size: 11px;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
