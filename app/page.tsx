@@ -101,7 +101,7 @@ type SharePayloadV1 = {
 
 function makeShareUrl(payload: SharePayloadV1) {
   if (typeof window === 'undefined') return '';
-  const base = window.location.origin + window.location.pathname;
+  const base = window.location.origin + '/view';
   const encoded = toBase64Url(JSON.stringify(payload));
   return `${base}?s=${encoded}`;
 }
@@ -669,6 +669,15 @@ export default function HomePage() {
     doc.save(`food-allergy-chart-${new Date().toISOString().slice(0, 10)}.pdf`);
   }
 
+  function deleteManualFlavor(flavor: string) {
+    setManualRows((prev) => prev.filter((p) => p.flavor !== flavor));
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.delete(flavor);
+      return next;
+    });
+  }
+
   function addManualFlavor(rec: Omit<FlavorRecord, 'source'>) {
     const flavor = rec.flavor.trim();
     if (!flavor) return;
@@ -881,6 +890,19 @@ export default function HomePage() {
                       title="Edit this entry"
                     >
                       Edit
+                    </button>
+                  )}
+                  {r.source === 'manual' && (
+                    <button
+                      type="button"
+                      className="secondary editBtn deleteBtn"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (window.confirm(`Delete "${r.flavor}"?`)) deleteManualFlavor(r.flavor);
+                      }}
+                      title="Delete this entry"
+                    >
+                      ✕
                     </button>
                   )}
                 </label>
